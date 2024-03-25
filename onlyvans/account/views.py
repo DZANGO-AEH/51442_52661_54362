@@ -1,10 +1,13 @@
 from django.shortcuts import render
+from .forms import CustomUserCreationForm
 
 def home(request):
     return render(request, 'account/index.html')
 
 def register(request):
-    return render(request, 'account/register.html')
+    RegisterForm = CustomUserCreationForm
+    context = {'form': RegisterForm}
+    return render(request, 'account/register.html', context)
 
 
 def login(request):

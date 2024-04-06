@@ -1,1 +1,23 @@
-<h1>Home</h1>
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+  <div class="p-5 text-center  rounded-3">
+<img class="mt-4 mb-3" width="100" height="100" src="{% static 'img/onlyvans-dark.svg' %}" alt="OnlyVans">
+      <h1 class="text-body-emphasis">Welcome to Only<strong>Vans</strong>!</h1>
+    <p class="col-lg-8 mx-auto fs-5 text-muted">
+      Sign up to support your favorite creators and get exclusive access to their content. Or, if you're a creator, start earning money from your fans today!
+    </p>
+    <div class="d-inline-flex gap-2 mb-5">
+      <button class="d-inline-flex align-items-center btn btn-secondary btn-lg px-4" type="button">
+        Register
+      </button>
+      <button class="btn btn-primary btn-lg px-4" type="button">
+        I already have an account
+      </button>
+    </div>
+  </div>
+
+
+{% endblock %}

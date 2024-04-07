@@ -1,9 +1,13 @@
 {% extends 'base.html' %}{% block title %}Sign Up{% endblock %}
+{% load crispy_forms_tags %}
 {% block content %}
+{% include 'navbar.html' %}
+<div class="container main thin-form py-5">
     <h2>Sign up</h2>
-    <form method="post">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit">Sign up</button>
+    <form method="POST" autocomplete="off">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input class="btn btn-outline-primary" type="submit" value="Register"/>
     </form>
+</div>
 {% endblock %}

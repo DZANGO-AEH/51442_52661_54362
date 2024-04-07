@@ -1,0 +1,26 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            Only<strong>Vans</strong>
+            <img src="{% static 'img/onlyvans.svg' %}" alt="OnlyVans" width="30" height="30">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler"
+                aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="navbarToggler" class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="{% if request.path == '/' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="{% if request.resolver_match.url_name == 'register' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}" href="{% url 'register' %}">Register</a>
+                </li>
+                <li class="nav-item">
+                    <a class="{% if request.resolver_match.url_name == 'login' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}" href="{% url 'login' %}">Log In</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

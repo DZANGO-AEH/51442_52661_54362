@@ -1,0 +1,18 @@
+{% extends 'base.html' %}{% block title %}Create{% endblock %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+{% include 'creator/navbar.html' %}
+<div class="container main py-5">
+    <h2>➕ Create a new Tier</h2>
+    <hr>
+    <div class="row">
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <br>
+        <button class="btn btn-primary" type="submit">Create</button>
+    </form>
+        </div>
+</div>
+{% endblock %}

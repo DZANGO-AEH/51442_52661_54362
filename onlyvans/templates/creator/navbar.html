@@ -29,7 +29,7 @@
                 </li>
                 <li class="nav-item">
                     <a class="{% if request.resolver_match.url_name == 'tiers' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
-                       href="{% url '' %}">Tiers</a>
+                       href="{% url 'creator:tiers' %}">Tiers</a>
                 </li>
                 <li class="nav-item">
                     <a class="{% if request.resolver_match.url_name == 'profile' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"

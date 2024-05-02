@@ -1,6 +1,40 @@
 .thin-form {
     max-width: 500px;
 }
+
 .main {
     min-height: 100vh;
+}
+
+.carousel-item {
+    height: 600px;
+}
+
+.carousel-item img, .carousel-item video {
+    height: 100%;
+    object-fit: cover;  /* This will cover the area, cropping the image as needed */
+    width: 100%;
+}
+
+.carousel-indicators {
+    margin-bottom: 3rem;
+}
+
+.carousel-control-prev, .carousel-control-next {
+    height: 50%;
+    top: 25%;
+}
+
+.card-img-top {
+    height: 600px;  /* Ensures single images have the same height as carousel images */
+    object-fit: cover;
+    width: 100%;
+}
+.card-header {
+    display: flex;
+    align-items: center;
+    height: 50 px;
+}
+.card-header h5 {
+margin-bottom: 0;
 }

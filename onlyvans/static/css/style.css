@@ -33,8 +33,73 @@
 .card-header {
     display: flex;
     align-items: center;
-    height: 50 px;
+    justify-content: space-between;  /* This will spread out the elements */
+    padding: 15px;  /* Adds padding inside the header */
+    background-color: rgba(255, 255, 255, 0.8);  /* Optional: adds slight transparency */
 }
 .card-header h5 {
 margin-bottom: 0;
+}
+
+.profile-header {
+    height: 300px;
+    background-size: cover;
+    background-position: center;
+}
+
+.profile-avatar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 300px;
+}
+
+.profile-avatar img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border: 8px solid #ffffff;  /* White border, increase thickness */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.profile-info {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.social-links a {
+    margin-right: 15px;
+    text-decoration: none;
+    color: #007bff;  /* Bootstrap primary color */
+}
+
+.social-links a:hover {
+    text-decoration: underline;
+}
+
+.profile-actions .btn {
+    padding: 10px 20px;  /* Larger button for better touch */
+}
+
+.profile-stats {
+    display: flex;
+    justify-content: center;  /* Centers the stats in the container */
+    flex-wrap: wrap;  /* Allows items to wrap in smaller screens */
+    margin-top: 20px;  /* Adds space above the stats section */
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.9);  /* Light background for the stats */
+    border-radius: 10px;  /* Rounded corners */
+}
+
+.profile-stats span {
+    margin: 5px 15px;  /* Adds vertical and horizontal spacing between stats */
+    font-size: 16px;  /* Larger font size for better readability */
+    display: flex;
+    align-items: center;  /* Centers the text and icons vertically */
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);  /* Subtle shadow for depth */
+}
+
+.profile-stats span svg {
+    margin-right: 5px;  /* Space between icon and text */
 }

@@ -8,20 +8,21 @@
     <h2>🆕 Create a new post</h2>
     <hr>
     <div class="row">
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ post_form|crispy }}
-        <div class="form-group">
-            <label for="id_files" class="form-label">Upload media files:</label>
-            <input type="file" name="files" id="id_files" multiple class="form-control"
-                   accept="image/jpeg, image/png, video/mp4, video/avi">
-            <small class="form-text text-muted">You can upload multiple files at once.</small>
-
-        </div>
-        <br>
-        <button class="btn btn-primary" type="submit">Create</button>
-    </form>
-</div>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ post_form|crispy }}
+            <p><small class="form-text text-muted">You can manage your tiers <a
+                    href="{% url 'creator:tiers' %}">here.</a> </small></p>
+            <div class="form-group mb-3">
+                <label for="id_files" class="form-label">Upload media files:</label>
+                <input type="file" name="files" id="id_files" multiple class="form-control"
+                       accept="image/jpeg, image/png, video/mp4, video/avi">
+            </div>
+            <p><small class="form-text text-muted">You can upload multiple files at once.</small></p>
+            <br>
+            <button class="btn btn-primary" type="submit">Create</button>
+        </form>
+    </div>
 
 </div>
 

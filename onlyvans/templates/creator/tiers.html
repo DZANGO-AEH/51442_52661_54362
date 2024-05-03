@@ -5,21 +5,21 @@
 {% include 'creator/navbar.html' %}
 <div class="container main py-5">
     <h2>🏅 Your Tiers
-        <a class="btn btn-success" href="{% url 'creator:create-tier' %}">Add a new Tier</a> <!-- Add Tier button -->
+        <a class="btn btn-primary" href="{% url 'creator:create-tier' %}">Add a new Tier</a> <!-- Add Tier button -->
         &nbsp;
     </h2>
     <hr>
 
 {% for tier in tiers %}
 <div class="card mb-3">
-    <div class="card-header">{{ tier.name }} - ${{ tier.price }}</div>
+    <div class="card-header">{{ tier.name }}:&nbsp;<strong>${{ tier.price }}</strong></div>
     <div class="card-body">
         <p>{{ tier.description }}</p>
-        <p>Message Permission: {{ tier.message_permission|yesno:"Yes,No" }}</p>
+        <p>Message Permission: <strong>{{ tier.message_permission|yesno:"Yes,No" }}</strong></p>
         <h5>Subscribers ({{ tier.subscriber_count }}):</h5>
         <ul>
             {% for subscriber in tier.subscribers %}
-            <li>{{ subscriber.user.username }}</li>
+            <li><span class="badge badge-primary">{{ subscriber.user.username }}</span></li>
             {% empty %}
             <li>No subscribers yet.</li>
             {% endfor %}

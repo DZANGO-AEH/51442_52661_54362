@@ -33,7 +33,7 @@
                 </li>
                 <li class="nav-item">
                     <a class="{% if request.resolver_match.url_name == 'profile' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
-                       href="{% url '' %}">My profile</a>
+                       href="{% url 'profile' username=user.username %}">My profile</a>
                 </li>
                 <li class="nav-item">
                     <a class="{% if request.resolver_match.url_name == 'logout' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"

@@ -1,20 +1,70 @@
 {% extends 'base.html' %}
-{% block title %}Dashboard{% endblock %}
+{% block title %}Profile - {{ user.username }}{% endblock %}
 {% block content %}
+{% if user.is_content_creator %}
 {% include 'creator/navbar.html' %}
+{% else %}
+{% include 'client/navbar.html' %}
+{% endif %}
 {% load static %}
 {% load templatetags %}
+<div class="profile-header"
+     style="background-image: url('{% if profile.background_pic %}{{ profile.background_pic.url }}{% else %}{% static 'img/background.png' %}{% endif %}');">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="profile-avatar d-flex justify-content-center align-items-center">
+                    <img src="{% if profile.profile_pic %}{{ profile.profile_pic.url }}{% else %}{% static 'img/avatar.png' %}{% endif %}"
+                         alt="{{ user.username }}" class="rounded-circle">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-<div class="container main py-5">
-    <h2>
-        👋 Welcome, {% if user.first_name %}{{ user.first_name }}{% else %}@{{ user.username }}{% endif %}!
-        &nbsp;
-        <a class="btn btn-primary" href="{% url 'creator:create-post' %}">Create a new post</a>
-    </h2>
-    <hr>
+<div class="container main py-2">
+    <div class="profile-info">
+        <h1>{{ user.get_full_name|default:user.username }}</h1>
+        <p>{{ profile.description|default:"No description provided by the user." }}</p>
+        <div class="social-links">
+            {% if profile.website_url %}
+            <a href="{{ profile.website_url }}">🌐Website</a>
+            {% endif %}
+            {% if profile.twitter_url %}
+            <a href="{{ profile.twitter_url }}">🗙 Twitter</a>
+            {% endif %}
+            {% if profile.instagram_url %}
+            <a href="{{ profile.instagram_url }}">📷 Instagram</a>
+            {% endif %}
+            {% if not profile.website_url and not profile.twitter_url and not profile.instagram_url %}
+            <p>No social links provided by the user.</p>
+            {% endif %}
+            <p>Member since: {{ user.date_joined|date:"F d, Y" }}</p>
+        </div>
+        <div class="profile-actions">
+            {% if is_own_profile %}
+            <a href="{% url 'update-profile' %}" class="btn btn-primary">Edit your profile</a>
+            {% elif user.is_content_creator %}
+            <button class="btn btn-success">Follow</button>
+            {% endif %}
+        </div>
+        <div class="profile-stats">
+            {% if user.is_content_creator %}
+            <span>👀 Subscribers: {{ active_subscribers_count }}</span>
+            <span>📝 Posts: {{ user.user_posts.count }}</span>
+            <span>📈 Tier levels: {{user.tiers.count }}</span>
+            <span>👍 Likes: {{total_likes}}</span>
+            {% else %}
+            <span>💸 Active subscriptions: {{ total_subscriptions }}</span>
+            <span>❤️ Favourites: {{ total_favourites }}</span>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if user.is_content_creator %}
     <div class="row">
         <div class="col-md-7">
-            <h3>Your posts:</h3>
+            <h2>Posts by {{ user.username }}</h2>
             {% for post in posts %}
             <div class="card mb-4 shadow-sm">
                 <div class="card-header">
@@ -91,5 +141,6 @@
             {% endfor %}
         </div>
     </div>
+    {% endif %}
 </div>
 {% endblock %}

@@ -1,14 +1,12 @@
 from django.shortcuts import render, redirect
-from .forms import CustomUserCreationForm
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import authenticate, login, logout
-from .forms import CustomUserChangeForm, UserProfileForm, UserPasswordChangeForm, CustomUserUpdateForm
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from .forms import CustomUserCreationForm, CustomUserChangeForm, UserProfileForm, UserPasswordChangeForm, CustomUserUpdateForm
 from .models import UserProfile, CustomUser
 from creator.models import Post
-from django.contrib.auth import update_session_auth_hash
 from .helpers import get_active_subscribers_count, get_total_likes, get_total_favourites, get_total_subscriptions
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 
 def home(request):
@@ -22,11 +20,11 @@ def home(request):
 
 def register(request):
     form = CustomUserCreationForm()
-
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Your account has been created successfully! You can now login.')
             return redirect('login')
     context = {'form': form}
     return render(request, 'account/register.html', context)
@@ -34,47 +32,45 @@ def register(request):
 
 def userlogin(request):
     form = AuthenticationForm()
-
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
-            if user is not None and user.is_content_creator:
+            if user is not None:
                 login(request, user)
-                return redirect('creator:dashboard')
-            if user is not None and not user.is_content_creator:
-                login(request, user)
-                return redirect('client:dashboard')
-
+                if user.is_content_creator:
+                    return redirect('creator:dashboard')
+                else:
+                    return redirect('client:dashboard')
+            else:
+                messages.error(request, "Invalid username or password.")
     context = {'form': form}
     return render(request, 'account/login.html', context)
 
 
 def userlogout(request):
     logout(request)
+    messages.info(request, 'You have been logged out.')
     return redirect('')
 
 
 @login_required
 def profile(request, username):
-    # Assuming the username is passed via URL, if not, adjust accordingly.
-    # If not using usernames, adjust to use id or other unique identifiers.
-    username = username  # If URL includes username, replace with appropriate capture.
     try:
         user = CustomUser.objects.get(username=username)
         user_profile = UserProfile.objects.get(user=user)
     except (CustomUser.DoesNotExist, UserProfile.DoesNotExist):
         user = request.user
         user_profile = None
+        messages.error(request, "User profile not found.")
     posts = Post.objects.filter(user=request.user).order_by('-posted_at')
-    is_own_profile = request.user == user  # Check if the logged-in user is viewing their own profile
+    is_own_profile = request.user == user
     active_subscribers_count = get_active_subscribers_count(user)
     total_likes = get_total_likes(user)
     total_favourites = get_total_favourites(user)
     total_subscriptions = get_total_subscriptions(user)
-
     return render(request, 'account/profile.html', {
         'user': user,
         'profile': user_profile,
@@ -85,6 +81,7 @@ def profile(request, username):
         'total_subscriptions': total_subscriptions,
         'posts': posts
     })
+
 
 @login_required
 def update_profile(request):
@@ -113,7 +110,7 @@ def change_password(request):
         password_form = UserPasswordChangeForm(request.user, request.POST)
         if password_form.is_valid():
             user = password_form.save()
-            update_session_auth_hash(request, user)
+            update_session_auth_hash(request, user)  # Important to keep the user logged in after password change
             messages.success(request, 'Your password was successfully updated!')
             return redirect('update-profile')
         else:

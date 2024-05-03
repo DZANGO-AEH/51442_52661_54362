@@ -3,6 +3,7 @@
 
 {% block content %}
 {% include 'creator/navbar.html' %}
+{% include 'messages.html' %}
 <div class="container main py-5">
     <h2>🏅 Your Tiers
         <a class="btn btn-primary" href="{% url 'creator:create-tier' %}">Add a new Tier</a> <!-- Add Tier button -->

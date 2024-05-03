@@ -59,20 +59,22 @@ def userlogout(request):
 @login_required
 def profile(request, username):
     try:
-        user = CustomUser.objects.get(username=username)
-        user_profile = UserProfile.objects.get(user=user)
-    except (CustomUser.DoesNotExist, UserProfile.DoesNotExist):
         user = request.user
+        user_viewed = CustomUser.objects.get(username=username)
+        user_profile = UserProfile.objects.get(user=user_viewed)
+    except (CustomUser.DoesNotExist, UserProfile.DoesNotExist):
+        user_viewed = request.user
         user_profile = None
         messages.error(request, "User profile not found.")
-    posts = Post.objects.filter(user=request.user).order_by('-posted_at')
-    is_own_profile = request.user == user
-    active_subscribers_count = get_active_subscribers_count(user)
-    total_likes = get_total_likes(user)
-    total_favourites = get_total_favourites(user)
-    total_subscriptions = get_total_subscriptions(user)
+    posts = Post.objects.filter(user=user_viewed).order_by('-posted_at')
+    is_own_profile = user_viewed == user
+    active_subscribers_count = get_active_subscribers_count(user_viewed)
+    total_likes = get_total_likes(user_viewed)
+    total_favourites = get_total_favourites(user_viewed)
+    total_subscriptions = get_total_subscriptions(user_viewed)
     return render(request, 'account/profile.html', {
-        'user': user,
+        'user':  user,
+        'user_viewed': user_viewed,
         'profile': user_profile,
         'is_own_profile': is_own_profile,
         'active_subscribers_count': active_subscribers_count,

@@ -16,7 +16,7 @@
             <div class="col-md-12">
                 <div class="profile-avatar d-flex justify-content-center align-items-center">
                     <img src="{% if profile.profile_pic %}{{ profile.profile_pic.url }}{% else %}{% static 'img/avatar.png' %}{% endif %}"
-                         alt="{{ user.username }}" class="rounded-circle">
+                         alt="{{ user_viewed.username }}" class="rounded-circle">
                 </div>
             </div>
         </div>
@@ -25,7 +25,7 @@
 
 <div class="container main py-2">
     <div class="profile-info">
-        <h1>{{ user.get_full_name|default:user.username }}</h1>
+        <h1>{{ user_viewed.get_full_name|default:user_viewed.username }}</h1>
         <p>{{ profile.description|default:"No description provided by the user." }}</p>
         <div class="social-links">
             {% if profile.website_url %}
@@ -40,20 +40,20 @@
             {% if not profile.website_url and not profile.twitter_url and not profile.instagram_url %}
             <p>No social links provided by the user.</p>
             {% endif %}
-            <p>Member since: {{ user.date_joined|date:"F d, Y" }}</p>
+            <p>Member since: {{ user_viewed.date_joined|date:"F d, Y" }}</p>
         </div>
         <div class="profile-actions">
             {% if is_own_profile %}
             <a href="{% url 'update-profile' %}" class="btn btn-primary">Edit your profile</a>
-            {% elif user.is_content_creator %}
-            <button class="btn btn-success">Follow</button>
+            {% elif user_viewed.is_content_creator and not user.is_content_creator %}
+            <button class="btn btn-success">Subscribe</button>
             {% endif %}
         </div>
         <div class="profile-stats">
-            {% if user.is_content_creator %}
+            {% if user_viewed.is_content_creator %}
             <span>👀 Subscribers: {{ active_subscribers_count }}</span>
-            <span>📝 Posts: {{ user.user_posts.count }}</span>
-            <span>📈 Tier levels: {{user.tiers.count }}</span>
+            <span>📝 Posts: {{ user_viewed.user_posts.count }}</span>
+            <span>📈 Tier levels: {{user_viewed.tiers.count }}</span>
             <span>👍 Likes: {{total_likes}}</span>
             {% else %}
             <span>💸 Active subscriptions: {{ total_subscriptions }}</span>
@@ -62,10 +62,10 @@
         </div>
     </div>
 
-    {% if user.is_content_creator %}
+    {% if user_viewed.is_content_creator %}
     <div class="row">
         <div class="col-md-7">
-            <h2>Posts by {{ user.username }}</h2>
+            <h2>Posts by @{{ user_viewed.username }}</h2>
             {% for post in posts %}
             <div class="card mb-4 shadow-sm">
                 <div class="card-header">

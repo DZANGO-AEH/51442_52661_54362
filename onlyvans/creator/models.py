@@ -19,11 +19,12 @@ class Tier(models.Model):
 class Subscription(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='subscriptions')
     tier = models.ForeignKey(Tier, on_delete=models.CASCADE, related_name='subscribers')
+    paypal_subscription_id = models.CharField(max_length=300)
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField()
 
     def __str__(self):
-        return f'{self.user.usegrname} - {self.tier.name}'
+        return f'{self.user.usegrname} - {self.tier.name} subscription'
 
     def is_expired(self):
         return self.end_date < timezone.now()

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Subscribe to {{ creator.username }}{% endblock %}
+{% block content %}
+<div class="container main py-5">
+    <h2>🤩 Subscribe to @{{ creator.username }}</h2>
+
+    <hr>
+    <div class="row">
+        <p>
+            Subscribe to @{{ creator.username }} to get access to exclusive content and support their work. Choose a
+            tier
+            that fits your budget and preferences.
+        </p>
+        <p>
+            <strong>Subscribing to a creator is a monthly commitment. You can cancel your subscription at any time.</strong>
+        </p>
+        <h3>
+            Available Tiers:
+        </h3>
+        {% for tier in tiers %}
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header">
+                    <h4>{{ tier.name }}</h4>
+                </div>
+                <div class="card-body">
+                    <p>{{ tier.description }}</p>
+                    <h5>${{ tier.price }}</h5>
+                    <a href="{% url 'client:subscribe-to-tier' creator.username tier.id %}" class="btn btn-primary">Subscribe</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p>This creator does not have any tiers available.</p>
+        {% endfor %}
+        <p>
+            <a href="{% url 'profile' creator.username %}" class="btn btn-secondary">Back to profile</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

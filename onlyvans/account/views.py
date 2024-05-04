@@ -84,14 +84,16 @@ def profile(request, username):
         'posts': posts
     })
 
-
 @login_required
 def update_profile(request):
     if request.method == 'POST':
         user_form = CustomUserUpdateForm(request.POST, instance=request.user)
         profile_form = UserProfileForm(request.POST, request.FILES, instance=request.user.profile)
         if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
+            user = user_form.save()
+            if user_form.cleaned_data.get('same_email'):
+                user.paypal_email = user.email
+                user.save()
             profile_form.save()
             messages.success(request, 'Your profile was successfully updated!')
             return redirect('update-profile')
@@ -99,13 +101,14 @@ def update_profile(request):
             messages.error(request, 'Please correct the error below.')
     else:
         user_form = CustomUserUpdateForm(instance=request.user)
+        if request.user.paypal_email == request.user.email:
+            user_form.fields['same_email'].initial = True
         profile_form = UserProfileForm(instance=request.user.profile)
+
     return render(request, 'account/update_profile.html', {
         'user_form': user_form,
         'profile_form': profile_form
     })
-
-
 @login_required
 def change_password(request):
     if request.method == 'POST':

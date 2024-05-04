@@ -1,8 +1,6 @@
 {% extends 'base.html' %}{% block title %}Tiers{% endblock %}
 {% load crispy_forms_tags %}
-
 {% block content %}
-{% include 'creator/navbar.html' %}
 {% include 'messages.html' %}
 <div class="container main py-5">
     <h2>🏅 Your Tiers
@@ -18,13 +16,11 @@
         <p>{{ tier.description }}</p>
         <p>Message Permission: <strong>{{ tier.message_permission|yesno:"Yes,No" }}</strong></p>
         <h5>Subscribers ({{ tier.subscriber_count }}):</h5>
-        <ul>
             {% for subscriber in tier.subscribers %}
-            <li><span class="badge badge-primary">{{ subscriber.user.username }}</span></li>
+            <a href="{% url 'profile' subscriber.user.username %}"><span class="badge text-bg-primary">@{{ subscriber.user.username }}</span></a>
             {% empty %}
-            <li>No subscribers yet.</li>
+            <span>No subscribers yet.</span>
             {% endfor %}
-        </ul>
     </div>
 </div>
 {% empty %}

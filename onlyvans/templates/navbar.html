@@ -11,15 +11,79 @@
         </button>
         <div id="navbarToggler" class="collapse navbar-collapse">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                {% if user.is_authenticated %}
+                {% if user.is_content_creator %}
+                <!-- Navbar for creators -->
                 <li class="nav-item">
-                    <a class="{% if request.path == '/' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}" href="/">Home</a>
+                    <a class="{% if request.resolver_match.url_name == 'dashboard' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                       href="{% url 'creator:dashboard' %}">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="{% if request.resolver_match.url_name == 'register' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}" href="{% url 'register' %}">Register</a>
+                    <a class="{% if request.resolver_match.url_name == 'notifications' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                       href="{% url '' %}">Notifications</a>
                 </li>
                 <li class="nav-item">
-                    <a class="{% if request.resolver_match.url_name == 'login' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}" href="{% url 'login' %}">Log In</a>
+                    <a class="{% if request.resolver_match.url_name == 'messages' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                       href="{% url '' %}">Messages</a>
                 </li>
+                <li class="nav-item">
+                    <a class="{% if request.resolver_match.url_name == 'subscriptions' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                       href="{% url '' %}">Subscribers</a>
+                </li>
+                <li class="nav-item">
+                    <a class="{% if request.resolver_match.url_name == 'tiers' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                       href="{% url 'creator:tiers' %}">Tiers</a>
+                </li>
+                <li class="nav-item">
+                    <a class="{% if request.resolver_match.url_name == 'profile' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                       href="{% url 'profile' username=user.username %}">My profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="{% if request.resolver_match.url_name == 'logout' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                       href="{% url 'logout' %}">Log out</a>
+                </li>
+                {% else %}
+                <!-- Navbar for clients -->
+                <li class="nav-item">
+                    <a class="{% if request.resolver_match.url_name == 'dashboard' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                       href="{% url 'client:dashboard' %}">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="{% if request.resolver_match.url_name == 'notifications' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                       href="{% url '' %}">Notifications</a>
+                </li>
+                <li class="nav-item">
+                    <a class="{% if request.resolver_match.url_name == 'messages' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                       href="{% url '' %}">Messages</a>
+                </li>
+                <li class="nav-item">
+                    <a class="{% if request.resolver_match.url_name == 'subscriptions' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                       href="{% url '' %}">Subscriptions</a>
+                </li>
+                <li class="nav-item">
+                    <a class="{% if request.resolver_match.url_name == 'profile' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                       href="{% url 'profile' username=user.username %}">My profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="{% if request.resolver_match.url_name == 'logout' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                       href="{% url 'logout' %}">Log out</a>
+                </li>
+                {% endif %}
+                {% else %}
+                <!-- Navbar for users not logged in -->
+                <li class="nav-item">
+                    <a class="{% if request.path == '/' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                       href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="{% if request.resolver_match.url_name == 'register' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                       href="{% url 'register' %}">Register</a>
+                </li>
+                <li class="nav-item">
+                    <a class="{% if request.resolver_match.url_name == 'login' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                       href="{% url 'login' %}">Log In</a>
+                </li>
+                {% endif %}
             </ul>
         </div>
     </div>

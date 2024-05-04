@@ -1,11 +1,6 @@
 {% extends 'base.html' %}
-{% block title %}Profile - {{ user.username }}{% endblock %}
+{% block title %}Profile - {{ user_viewed.username }}{% endblock %}
 {% block content %}
-{% if user.is_content_creator %}
-{% include 'creator/navbar.html' %}
-{% else %}
-{% include 'client/navbar.html' %}
-{% endif %}
 {% include 'messages.html' %}
 {% load static %}
 {% load templatetags %}
@@ -29,7 +24,7 @@
         <p>{{ profile.description|default:"No description provided by the user." }}</p>
         <div class="social-links">
             {% if profile.website_url %}
-            <a href="{{ profile.website_url }}">🌐Website</a>
+            <a href="{{ profile.website_url }}">🌐 Website</a>
             {% endif %}
             {% if profile.twitter_url %}
             <a href="{{ profile.twitter_url }}">🗙 Twitter</a>
@@ -46,7 +41,7 @@
             {% if is_own_profile %}
             <a href="{% url 'update-profile' %}" class="btn btn-primary">Edit your profile</a>
             {% elif user_viewed.is_content_creator and not user.is_content_creator %}
-            <button class="btn btn-success">Subscribe</button>
+            <a href="{% url 'client:select-tier' user_viewed.username %}" class="btn btn-success">Subscribe</a>
             {% endif %}
         </div>
         <div class="profile-stats">
@@ -66,80 +61,7 @@
     <div class="row">
         <div class="col-md-7">
             <h2>Posts by @{{ user_viewed.username }}</h2>
-            {% for post in posts %}
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header">
-                    <h5>{{ post.title }}</h5>
-                </div>
-                {% if post.media_files.all.count > 1 %}
-                <div id="carousel{{ post.id }}" class="carousel slide">
-                    <div class="carousel-indicators">
-                        {% for media in post.media_files.all %}
-                        <button type="button" data-bs-target="#carousel{{ post.id }}"
-                                data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"
-                                aria-current="true" {% endif %} aria-label="Slide {{ forloop.counter }}"></button>
-                        {% endfor %}
-                    </div>
-                    <div class="carousel-inner">
-                        {% for media in post.media_files.all %}
-                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                            {% if media.file.url|lower|ends_with:".jpg" or media.file.url|lower|ends_with:".png" %}
-                            <img src="{{ media.file.url }}" class="d-block w-100" alt="{{ media.file.name }}">
-                            {% elif media.file.url|lower|ends_with:".mp4" or media.file.url|lower|ends_with:".avi" %}
-                            <video class="card-img-top" controls>
-                                {% if media.file.url|lower|ends_with:".mp4" %}
-                                <source src="{{ media.file.url }}" type="video/mp4">
-                                {% elif media.file.url|lower|ends_with:".avi" %}
-                                <source src="{{ media.file.url }}" type="video/x-msvideo">
-                                {% endif %}
-                                Your browser does not support the video tag.
-                            </video>
-                            {% endif %}
-                        </div>
-                        {% endfor %}
-                    </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ post.id }}"
-                            data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ post.id }}"
-                            data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                    </button>
-                </div>
-                {% elif post.media_files.all.count == 1 %}
-                <!-- Check for single image or video -->
-                {% with media=post.media_files.all.first %}
-                {% if media.file.url|lower|ends_with:".jpg" or media.file.url|lower|ends_with:".png" %}
-                <img src="{{ media.file.url }}" class="card-img-top" alt="{{ media.file.name }}">
-                {% elif media.file.url|lower|ends_with:".mp4" or media.file.url|lower|ends_with:".avi" %}
-                <video class="card-img-top" controls>
-                    {% if media.file.url|lower|ends_with:".mp4" %}
-                    <source src="{{ media.file.url }}" type="video/mp4">
-                    {% elif media.file.url|lower|ends_with:".avi" %}
-                    <source src="{{ media.file.url }}" type="video/x-msvideo">
-                    {% endif %}
-                    Your browser does not support the video tag.
-                </video>
-                {% endif %}
-                {% endwith %}
-                {% endif %}
-                <div class="card-body">
-                    <p class="card-text">{{ post.text }}</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
-                        </div>
-                        <small class="text-muted">{{ post.posted_at|timesince }} ago</small>
-                    </div>
-                </div>
-            </div>
-            {% empty %}
-            <p>No posts available.</p>
-            {% endfor %}
+            {% include 'creator/feed.html' with posts=posts %}
         </div>
     </div>
     {% endif %}

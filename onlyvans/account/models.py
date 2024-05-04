@@ -4,10 +4,11 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
+from .validators import validate_twitter_url, validate_instagram_url
 
 class CustomUser(AbstractUser):
     is_content_creator = models.BooleanField(default=False, verbose_name="Are you a content creator?")
+    paypal_email = models.EmailField(_("PayPal email"), null=True, blank=True)  # Add PayPal email
     def __str__(self):
         return self.username
 
@@ -18,11 +19,12 @@ class UserProfile(models.Model):
     background_pic = models.ImageField(upload_to='backgrounds/', null=True, blank=True)
     description = models.TextField(_("Description"), blank=True)
     website_url = models.URLField(_("Website URL"), max_length=255, null=True, blank=True)
-    twitter_url = models.URLField(_("Twitter URL"), max_length=255, null=True, blank=True)
-    instagram_url = models.URLField(_("Instagram URL"), max_length=255, null=True, blank=True)
+    twitter_url = models.URLField(_("Twitter URL"), max_length=255, null=True, blank=True, validators=[validate_twitter_url])
+    instagram_url = models.URLField(_("Instagram URL"), max_length=255, null=True, blank=True, validators=[validate_instagram_url])
 
     def __str__(self):
         return f"{self.user.username}'s profile"
+
 
 # Automatically create or update the user profile
 @receiver(post_save, sender=CustomUser)

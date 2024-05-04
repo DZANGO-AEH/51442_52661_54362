@@ -25,26 +25,27 @@ def create_post(request):
         post_form = PostForm(request.POST)
         media_form = MediaForm(request.POST, request.FILES)
 
-        # Check if the "is this a free post?" checkbox is checked
-        if 'is_free' in request.POST and request.POST['is_free'] == 'on':
-            # If it is, remove 'tier' from the list of required fields
-            post_form.fields['tier'].required = False
-
-        if post_form.is_valid():
+        if post_form.is_valid() and media_form.is_valid():
             post = post_form.save(commit=False)
             post.user = request.user
             post.save()
 
             files = request.FILES.getlist('files')
             allowed_types = ['image/jpeg', 'image/png', 'video/mp4', 'video/avi']
-            for f in files:
-                if f.content_type in allowed_types:
-                    Media.objects.create(post=post, file=f)
-                else:
-                    # Handle invalid file type, maybe return an error message
-                    pass
+            for file in files:
+                if file.content_type not in allowed_types:
+                    media_form.add_error('files', f'Invalid file type: {file.content_type}')
+            if media_form.errors:
+                post.delete()
+                return render(request, 'creator/create_post.html', {
+                    'post_form': post_form,
+                    'media_form': media_form,
+                })
 
-            return redirect('creator:dashboard')  # Replace 'dashboard' with the actual name of your view or URL pattern
+            for file in files:
+                Media.objects.create(post=post, file=file)
+
+            return redirect('creator:dashboard')
 
     else:
         post_form = PostForm()
@@ -52,9 +53,8 @@ def create_post(request):
 
     return render(request, 'creator/create_post.html', {
         'post_form': post_form,
-        'media_form': media_form
+        'media_form': media_form,
     })
-
 
 @login_required
 @creator_required
@@ -81,6 +81,9 @@ def tiers(request):
 @login_required
 @creator_required
 def create_tier(request):
+    if not request.user.paypal_email:
+        messages.error(request, "You need to connect your PayPal account before creating a tier.")
+        return redirect('update-profile')
     if request.method == 'POST':
         form = TierForm(request.POST)
         if form.is_valid():

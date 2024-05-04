@@ -7,8 +7,10 @@
     <title>{{ app_name|default:"OnlyVans" }} | {% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
 </head>
 <body>
+{% include 'navbar.html' %}
 {% block content %}{% endblock %}
 {% include 'footer.html' %}
 </body>

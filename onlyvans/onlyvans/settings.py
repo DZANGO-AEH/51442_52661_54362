@@ -143,3 +143,9 @@ MESSAGE_TAGS = {
     message_constants.WARNING: 'warning',
     message_constants.ERROR: 'danger',
 }
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
+
+PAYPAL_MODE = 'sandbox'  # 'live' for production
+PAYPAL_CLIENT_ID = 'AcL9i9YZqySdSxUDI3pS_1RloCSzXnzmmODuQPqkvkMoyW7asX6lp3V9WJdqhL68BNNoSDd777uyf7fl'
+PAYPAL_CLIENT_SECRET = 'EHcGFog5WKVSmp2hCnuRf1l8MorWkqTFaDw6jEiNXie_y7mNlTIixuu_dpOBNLmjcqbm6Z78-Jak690V'

@@ -2,12 +2,6 @@
 {% block title %}Profile update{% endblock %}
 {% block content %}
 {% load crispy_forms_tags %}
-
-{% if user.is_content_creator %}
-{% include 'creator/navbar.html' %}
-{% else %}
-{% include 'client/navbar.html' %}
-{% endif %}
 {% include 'messages.html' %}
 {% load static %}
 {% load templatetags %}

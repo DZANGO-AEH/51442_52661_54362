@@ -1,0 +1,68 @@
+{% load static %}
+{% load templatetags %}
+{% for post in posts %}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header">
+                    <h5>{{ post.title }}</h5>
+                </div>
+                {% if post.media.all|length > 1 %}
+                <div id="carousel{{ post.id }}" class="carousel slide">
+                    <div class="carousel-indicators">
+                        {% for media in post.media.all %}
+                        <button type="button" data-bs-target="#carousel{{ post.id }}"
+                                data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"
+                                aria-current="true" {% endif %} aria-label="Slide {{ forloop.counter }}"></button>
+                        {% endfor %}
+                    </div>
+                    <div class="carousel-inner">
+                        {% for media in post.media.all %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            {% if media.file.url|lower|ends_with:".jpg" or media.file.url|lower|ends_with:".png" %}
+                            <img src="{{ media.file.url }}" class="d-block w-100" alt="{{ media.file.name }}">
+                            {% elif media.file.url|lower|ends_with:".mp4" or media.file.url|lower|ends_with:".avi" %}
+                            <video class="card-img-top" controls>
+                                <source src="{{ media.file.url }}" type="{{ media.file.content_type }}">
+                                Your browser does not support the video tag.
+                            </video>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ post.id }}"
+                            data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ post.id }}"
+                            data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+                {% elif post.media.all|length == 1 %}
+                <!-- Check for single image or video -->
+                {% with media=post.media.all.first %}
+                {% if media.file.url|lower|ends_with:".jpg" or media.file.url|lower|ends_with:".png" %}
+                <img src="{{ media.file.url }}" class="card-img-top" alt="{{ media.file.name }}">
+                {% elif media.file.url|lower|ends_with:".mp4" or media.file.url|lower|ends_with:".avi" %}
+                <video class="card-img-top" controls>
+                    <source src="{{ media.file.url }}" type="{{ media.file.content_type }}">
+                    Your browser does not support the video tag.
+                </video>
+                {% endif %}
+                {% endwith %}
+                {% endif %}
+                <div class="card-body">
+                    <p class="card-text">{{ post.text }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+                        </div>
+                        <small class="text-muted">{{ post.posted_at|timesince }} ago</small>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p>No posts available.</p>
+            {% endfor %}

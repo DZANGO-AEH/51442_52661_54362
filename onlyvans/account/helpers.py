@@ -1,6 +1,8 @@
 from django.db.models import Count, Q, Sum
 from django.utils import timezone
 from creator.models import Tier, Post, Favourite
+import re
+from django.core.exceptions import ValidationError
 
 def get_active_subscribers_count(user):
     return sum(tier.subscribers.count() for tier in user.tiers.all())

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Messages{% endblock %}
+{% block content %}
+<div class="container main py-5">
+<h2>🗨️ Message Threads</h2>
+<ul>
+    {% for thread in threads %}
+    <li><a href="{% url 'direct_messages:view_thread' thread.id %}">{{ thread }}</a></li>
+    {% empty %}
+    <li>No threads found.</li>
+    {% endfor %}
+</ul>
+</div>
+{% endblock %}

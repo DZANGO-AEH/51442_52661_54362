@@ -10,6 +10,7 @@ urlpatterns = [
 
     path('client/', include('client.urls')),
     path('creator/', include('creator.urls')),
+    path('direct_messages/', include('direct_messages.urls')),
 
 ]
 if settings.DEBUG:

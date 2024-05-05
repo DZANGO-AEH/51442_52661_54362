@@ -43,19 +43,15 @@ document.addEventListener('DOMContentLoaded', function () {
     let tierField = document.getElementById('id_tier');
 
     if (isFreePostCheckbox && tierField) {
-        let tierFieldParent = tierField.parentNode;
+        let tierFieldContainer = tierField.closest('.form-group') || tierField.parentNode;
         let tierLabel = document.querySelector('label[for="id_tier"]');
 
         function toggleTierField() {
-            if (isFreePostCheckbox.checked) {
-                tierFieldParent.style.display = 'none';
-                tierLabel.style.display = 'none';
-                tierField.required = false;
-            } else {
-                tierFieldParent.style.display = 'block';
-                tierLabel.style.display = 'block';
-                tierField.required = true;
-            }
+            let isFree = isFreePostCheckbox.checked;
+            tierFieldContainer.style.display = isFree ? 'none' : 'block';
+            tierLabel.style.display = isFree ? 'none' : 'block';
+            tierField.required = !isFree;
+            tierField.disabled = isFree;
         }
 
         isFreePostCheckbox.addEventListener('change', toggleTierField);

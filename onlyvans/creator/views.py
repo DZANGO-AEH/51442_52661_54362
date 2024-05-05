@@ -22,12 +22,16 @@ def dashboard(request):
 @creator_required
 def create_post(request):
     if request.method == 'POST':
+        print("POST request received")
         post_form = PostForm(request.POST, user=request.user)
         media_form = MediaForm(request.POST, request.FILES)
 
         if post_form.is_valid() and media_form.is_valid():
+            print("Both forms are valid")
             post = post_form.save(commit=False)
             post.user = request.user
+            if post.is_free:  # Ensure that tier is not set for free posts
+                post.tier = None
             post.save()
 
             files = request.FILES.getlist('files')
@@ -36,6 +40,7 @@ def create_post(request):
                 if file.content_type not in allowed_types:
                     media_form.add_error('files', f'Invalid file type: {file.content_type}')
             if media_form.errors:
+                print("Media form errors detected, deleting post")
                 post.delete()
                 return render(request, 'creator/create_post.html', {
                     'post_form': post_form,
@@ -45,7 +50,12 @@ def create_post(request):
             for file in files:
                 Media.objects.create(post=post, file=file)
 
+            print("Post created successfully")
             return redirect('creator:dashboard')
+        else:
+            print("Form is invalid")
+            print("Post form errors:", post_form.errors)
+            print("Media form errors:", media_form.errors)
 
     else:
         post_form = PostForm(user=request.user)
@@ -55,7 +65,6 @@ def create_post(request):
         'post_form': post_form,
         'media_form': media_form,
     })
-
 @login_required
 @creator_required
 def tiers(request):

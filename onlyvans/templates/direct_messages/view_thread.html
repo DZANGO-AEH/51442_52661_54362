@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Messages{% endblock %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container main py-5">
+    <h2>📨 Messages with {{ thread.get_other_participant(request.user).username }}</h2>
+    <hr>
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="list-group">
+                {% for message in thread.messages.all %}
+                <div class="list-group-item{% if message.sender == request.user %} list-group-item-secondary{% endif %}">
+                    <strong>{{ message.sender.username }}</strong>
+                    <span class="text-muted">{{ message.sent_at }}</span>
+                    <p>{{ message.body }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            <hr>
+            <form method="POST">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-primary">Send</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

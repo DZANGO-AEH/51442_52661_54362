@@ -3,11 +3,11 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from .forms import CustomUserCreationForm, CustomUserChangeForm, UserProfileForm, UserPasswordChangeForm, CustomUserUpdateForm
 from .models import UserProfile, CustomUser
-from creator.models import Post
+from creator.models import Post, Subscription
 from .helpers import get_active_subscribers_count, get_total_likes, get_total_favourites, get_total_subscriptions
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-
+from django.shortcuts import get_object_or_404
 
 def home(request):
     if request.user.is_authenticated:
@@ -59,21 +59,31 @@ def userlogout(request):
 @login_required
 def profile(request, username):
     try:
-        user = request.user
-        user_viewed = CustomUser.objects.get(username=username)
-        user_profile = UserProfile.objects.get(user=user_viewed)
+        user_viewed = get_object_or_404(CustomUser, username=username)
+        user_profile = get_object_or_404(UserProfile, user=user_viewed)
     except (CustomUser.DoesNotExist, UserProfile.DoesNotExist):
+        messages.error(request, "User profile not found.")
         user_viewed = request.user
         user_profile = None
-        messages.error(request, "User profile not found.")
+
     posts = Post.objects.filter(user=user_viewed).order_by('-posted_at')
-    is_own_profile = user_viewed == user
+    is_own_profile = user_viewed == request.user
     active_subscribers_count = get_active_subscribers_count(user_viewed)
     total_likes = get_total_likes(user_viewed)
     total_favourites = get_total_favourites(user_viewed)
     total_subscriptions = get_total_subscriptions(user_viewed)
+
+    user_subscription = Subscription.objects.filter(user=request.user, status='ACTIVE').first()
+    recipient_subscription = Subscription.objects.filter(user=user_viewed, status='ACTIVE').first()
+
+    can_message = (
+        user_subscription and user_subscription.tier.message_permission
+    ) or (
+        recipient_subscription and recipient_subscription.tier.message_permission
+    ) or is_own_profile
+
     return render(request, 'account/profile.html', {
-        'user':  user,
+        'user': request.user,
         'user_viewed': user_viewed,
         'profile': user_profile,
         'is_own_profile': is_own_profile,
@@ -81,7 +91,8 @@ def profile(request, username):
         'total_likes': total_likes,
         'total_favourites': total_favourites,
         'total_subscriptions': total_subscriptions,
-        'posts': posts
+        'posts': posts,
+        'can_message': can_message
     })
 
 @login_required

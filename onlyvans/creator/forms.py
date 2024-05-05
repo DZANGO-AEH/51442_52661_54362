@@ -5,6 +5,9 @@ from django.forms import ClearableFileInput
 from django.utils.translation import gettext_lazy as _
 
 
+from django import forms
+from .models import Post, Tier
+
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
@@ -21,16 +24,24 @@ class PostForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if user:
             self.fields['tier'].queryset = Tier.objects.filter(user=user)
+        # Update the 'tier' field required status based on the current input data or instance
+        if self.data:
+            is_free = self.data.get('is_free', 'off') == 'on'
+        else:
+            is_free = self.instance.is_free
+        self.fields['tier'].required = not is_free
 
     def clean(self):
         cleaned_data = super().clean()
         is_free = cleaned_data.get('is_free')
         tier = cleaned_data.get('tier')
 
-        # If the post is not free, ensure a tier is selected
-        if not is_free and not tier:
+        if is_free:
+            cleaned_data['tier'] = None
+        elif not tier:
             self.add_error('tier', 'This field is required for paid posts.')
 
+        return cleaned_data
 
 class MediaForm(forms.Form):
     files = forms.FileField(label='Upload media files', required=False, widget=ClearableFileInput(attrs={'allow_multiple_selected': True}))

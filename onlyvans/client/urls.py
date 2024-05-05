@@ -8,6 +8,7 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name="dashboard"),
     path('subscribe/<str:username>/', views.select_tier, name='select-tier'),
     path('subscribe/<str:username>/<int:tier_id>/', views.subscribe_to_tier, name='subscribe-to-tier'),
-    path('unsubscribe/<str:username>/<int:tier_id>/', views.cancel_paypal_subscription, name='cancel-paypal-subscription'),
-    path('subscribe/<str:username>/<int:tier_id>/execute/', views.execute_paypal_subscription, name='execute-paypal-subscription'),
+    path('stripe-success/', views.stripe_success, name='stripe-success'),
+    path('stripe-cancel/', views.stripe_cancel, name='stripe-cancel'),
+    path('stripe-webhook/', views.stripe_webhook, name='stripe-webhook'),
 ]

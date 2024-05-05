@@ -24,32 +24,38 @@
         <p>{{ profile.description|default:"No description provided by the user." }}</p>
         <div class="social-links">
             {% if profile.website_url %}
-            <a href="{{ profile.website_url }}">🌐 Website</a>
+            <a href="{{ profile.website_url }}" class="btn btn-outline-secondary">🌐 Website</a>
             {% endif %}
             {% if profile.twitter_url %}
-            <a href="{{ profile.twitter_url }}">🗙 Twitter</a>
+            <a href="{{ profile.twitter_url }}" class="btn btn-outline-secondary">🗙 Twitter</a>
             {% endif %}
             {% if profile.instagram_url %}
-            <a href="{{ profile.instagram_url }}">📷 Instagram</a>
+            <a href="{{ profile.instagram_url }}" class="btn btn-outline-secondary">📷 Instagram</a>
             {% endif %}
             {% if not profile.website_url and not profile.twitter_url and not profile.instagram_url %}
             <p>No social links provided by the user.</p>
             {% endif %}
-            <p>Member since: {{ user_viewed.date_joined|date:"F d, Y" }}</p>
         </div>
+        <p class="mt-3"><em>Member since: {{ user_viewed.date_joined|date:"F d, Y" }}</em></p>
         <div class="profile-actions">
             {% if is_own_profile %}
             <a href="{% url 'update-profile' %}" class="btn btn-primary">Edit your profile</a>
-            {% elif user_viewed.is_content_creator and not user.is_content_creator %}
+            {% else %}
+            {% if user_viewed.is_content_creator and not user.is_content_creator %}
             <a href="{% url 'client:select-tier' user_viewed.username %}" class="btn btn-success">Subscribe</a>
+            {% endif %}
+            {% if can_message %}
+            <a href="{% url 'direct_messages:send_message' user_viewed.username %}" class="btn btn-secondary">Send
+                Message</a>
+            {% endif %}
             {% endif %}
         </div>
         <div class="profile-stats">
             {% if user_viewed.is_content_creator %}
             <span>👀 Subscribers: {{ active_subscribers_count }}</span>
             <span>📝 Posts: {{ user_viewed.user_posts.count }}</span>
-            <span>📈 Tier levels: {{user_viewed.tiers.count }}</span>
-            <span>👍 Likes: {{total_likes}}</span>
+            <span>📈 Tier levels: {{ user_viewed.tiers.count }}</span>
+            <span>👍 Likes: {{ total_likes }}</span>
             {% else %}
             <span>💸 Active subscriptions: {{ total_subscriptions }}</span>
             <span>❤️ Favourites: {{ total_favourites }}</span>

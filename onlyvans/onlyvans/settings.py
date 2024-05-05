@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'account',
     'creator',
     'client',
+    'direct_messages',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -146,6 +147,6 @@ MESSAGE_TAGS = {
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
 
-PAYPAL_MODE = 'sandbox'  # 'live' for production
-PAYPAL_CLIENT_ID = 'AcL9i9YZqySdSxUDI3pS_1RloCSzXnzmmODuQPqkvkMoyW7asX6lp3V9WJdqhL68BNNoSDd777uyf7fl'
-PAYPAL_CLIENT_SECRET = 'EHcGFog5WKVSmp2hCnuRf1l8MorWkqTFaDw6jEiNXie_y7mNlTIixuu_dpOBNLmjcqbm6Z78-Jak690V'
+STRIPE_PUBLIC_KEY = "pk_test_OUX4U69NmHLC98Qyt5SyS0gO"
+STRIPE_SECRET_KEY = "sk_test_51BxwpQCgJvsRWmtc6TNu6ZKUpouPL5k4QNPkq3CZwB9MTT0gvdmZbIwA3m7CFbEGvureH9NmCdaD8UFUvyzFgqOt00h2fL0TUV"
+STRIPE_WEBHOOK_SECRET = "whsec_d95b26ac9f1390cd98d97779aca64367020032bab29333c38a3539056b3f9574"

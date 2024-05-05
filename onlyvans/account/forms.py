@@ -12,7 +12,7 @@ class CustomUserCreationForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ("username", "email", "password1", "password2", "is_content_creator", "paypal_email")
+        fields = ("username", "email", "password1", "password2", "is_content_creator")
 
     def clean_username(self):
         username = self.cleaned_data['username'].lower()

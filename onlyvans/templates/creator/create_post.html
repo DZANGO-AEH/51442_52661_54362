@@ -22,33 +22,6 @@
             <button class="btn btn-primary" type="submit">Create</button>
         </form>
     </div>
-
 </div>
-
-<script>
-    // Get the 'is it a free post' checkbox, the 'tier' field and its label
-    var isFreePostCheckbox = document.getElementById('id_is_free');
-    var tierField = document.getElementById('id_tier');
-    var tierLabel = document.querySelector('label[for="id_tier"]');  // Select the label using the 'for' attribute
-
-    // Function to show or hide the 'tier' field and its label based on the state of the 'is it a free post' checkbox
-    function toggleTierField() {
-        if (isFreePostCheckbox.checked) {
-            tierField.style.display = 'none';
-            tierLabel.style.display = 'none';  // Hide the label
-            tierField.required = false;  // Set the 'tier' field to not be required
-        } else {
-            tierField.style.display = 'block';
-            tierLabel.style.display = 'block';  // Show the label
-            tierField.required = true;  // Set the 'tier' field to be required
-        }
-    }
-
-    // Listen for changes to the 'is it a free post' checkbox
-    isFreePostCheckbox.addEventListener('change', toggleTierField);
-
-    // Call the function once to set the initial state of the 'tier' field and its label
-    toggleTierField();
-</script>
 
 {% endblock %}

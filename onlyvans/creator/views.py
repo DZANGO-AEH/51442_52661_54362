@@ -22,7 +22,7 @@ def dashboard(request):
 @creator_required
 def create_post(request):
     if request.method == 'POST':
-        post_form = PostForm(request.POST)
+        post_form = PostForm(request.POST, user=request.user)
         media_form = MediaForm(request.POST, request.FILES)
 
         if post_form.is_valid() and media_form.is_valid():
@@ -48,7 +48,7 @@ def create_post(request):
             return redirect('creator:dashboard')
 
     else:
-        post_form = PostForm()
+        post_form = PostForm(user=request.user)
         media_form = MediaForm()
 
     return render(request, 'creator/create_post.html', {
@@ -88,9 +88,9 @@ def create_tier(request):
         form = TierForm(request.POST)
         if form.is_valid():
             new_tier = form.save(commit=False)
-            new_tier.user = request.user  # Set the user as the current user
+            new_tier.user = request.user
             new_tier.save()
-            return redirect('creator:tiers')  # Redirect to the tier overview page
+            return redirect('creator:tiers')
     else:
         form = TierForm()
 

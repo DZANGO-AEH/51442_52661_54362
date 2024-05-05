@@ -2,6 +2,7 @@ from django import forms
 from .models import Post, Tier
 from django.core.exceptions import ValidationError
 from django.forms import ClearableFileInput
+from django.utils.translation import gettext_lazy as _
 
 
 class PostForm(forms.ModelForm):
@@ -16,8 +17,10 @@ class PostForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
-        self.fields['tier'].required = False
+        if user:
+            self.fields['tier'].queryset = Tier.objects.filter(user=user)
 
     def clean(self):
         cleaned_data = super().clean()
@@ -28,8 +31,6 @@ class PostForm(forms.ModelForm):
         if not is_free and not tier:
             self.add_error('tier', 'This field is required for paid posts.')
 
-        return cleaned_data
-
 
 class MediaForm(forms.Form):
     files = forms.FileField(label='Upload media files', required=False, widget=ClearableFileInput(attrs={'allow_multiple_selected': True}))
@@ -38,3 +39,9 @@ class TierForm(forms.ModelForm):
     class Meta:
         model = Tier
         fields = ['name', 'price', 'description', 'message_permission']
+
+    def clean_price(self):
+        price = self.cleaned_data.get('price')
+        if price is not None and price <= 0:
+            raise ValidationError(_("Price must be greater than zero."))
+        return price

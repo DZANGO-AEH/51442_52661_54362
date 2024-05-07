@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Discover Creators{% endblock %}
+{% block content %}
+<div class="container main py-5">
+    <h2>🔍 Discover Content Creators</h2>
+    <hr>
+
+    <!-- Search Bar -->
+    <form method="GET" action="{% url 'client:discover_creators' %}" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="q" value="{{ search_query }}" class="form-control" placeholder="Search for creators...">
+            <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+    </form>
+
+    {% if search_query %}
+        <h3>Search Results for "{{ search_query }}"</h3>
+        <div class="row">
+            {% for creator in search_results %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">@{{ creator.username }}</h5>
+                            <p class="card-text">{{ creator.profile.description|truncatewords:10 }}</p>
+                            <a href="{% url 'profile' creator.username %}" class="btn btn-primary">View Profile</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            {% if not search_results %}
+                <p>No results found.</p>
+            {% endif %}
+        </div>
+        <hr>
+    {% endif %}
+
+    <h3>🔥 Top Creators</h3>
+    <div class="row">
+        {% for creator in top_creators %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@{{ creator.username }}</h5>
+                        <p class="card-text">{{ creator.profile.description|truncatewords:10 }}</p>
+                        <p class="card-text text-muted">Subscribers: {{ creator.subscribers_count }}</p>
+                        <a href="{% url 'profile' creator.username %}" class="btn btn-primary">View Profile</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <hr>
+
+    <h3>🌟 New Faces</h3>
+    <div class="row">
+        {% for creator in new_faces %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@{{ creator.username }}</h5>
+                        <p class="card-text">{{ creator.profile.description|truncatewords:10 }}</p>
+                        <p class="card-text text-muted">Joined on {{ creator.date_joined|date:"M d, Y" }}</p>
+                        <a href "{% url 'profile' creator.username %}" class="btn btn-primary">View Profile</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

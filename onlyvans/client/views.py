@@ -5,7 +5,7 @@ from django.conf import settings
 from account.models import CustomUser as User
 from creator.models import Tier, Subscription, Post
 from django.urls import reverse
-from django.db.models import Q, Value, CharField
+from django.db.models import Q, Value, CharField, Count
 from .decorators import client_required
 import stripe
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
@@ -41,6 +41,40 @@ def dashboard(request):
         'posts': posts,
     })
 
+@login_required(login_url='login')
+@client_required
+def discover_creators(request):
+    search_query = request.GET.get('q', '')
+
+    top_creators = User.objects.filter(is_content_creator=True).annotate(
+        subscribers_count=Count(
+            'tiers__subscribers',
+            filter=Q(tiers__subscribers__status='ACTIVE')
+        )
+    ).order_by('-subscribers_count')[:6]
+
+    new_faces = User.objects.filter(is_content_creator=True).annotate(
+        subscribers_count=Count(
+            'tiers__subscribers',
+            filter=Q(tiers__subscribers__status='ACTIVE')
+        )
+    ).order_by('-date_joined')[:6]
+
+    search_results = User.objects.filter(
+        username__icontains=search_query, is_content_creator=True
+    ).annotate(
+        subscribers_count=Count(
+            'tiers__subscribers',
+            filter=Q(tiers__subscribers__status='ACTIVE')
+        )
+    ) if search_query else []
+
+    return render(request, 'client/discover_creators.html', {
+        'top_creators': top_creators,
+        'new_faces': new_faces,
+        'search_results': search_results,
+        'search_query': search_query
+    })
 
 @login_required(login_url='login')
 @client_required

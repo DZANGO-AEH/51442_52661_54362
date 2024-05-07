@@ -6,6 +6,7 @@ app_name = 'client'
 
 urlpatterns = [
     path('dashboard/', views.dashboard, name="dashboard"),
+    path('discover/', views.discover_creators, name='discover_creators'),
     path('subscribe/<str:username>/', views.select_tier, name='select-tier'),
     path('subscribe/<str:username>/<int:tier_id>/', views.subscribe_to_tier, name='subscribe-to-tier'),
     path('stripe-success/', views.stripe_success, name='stripe-success'),

@@ -50,8 +50,8 @@
                        href="{% url 'client:dashboard' %}">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="{% if request.resolver_match.url_name == 'notifications' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
-                       href="{% url '' %}">Notifications</a>
+                    <a class="{% if request.resolver_match.url_name == 'discover_creators' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                       href="{% url 'client:discover_creators' %}">Discover</a>
                 </li>
                 <li class="nav-item">
                     <a class="{% if request.path|starts_with:'/direct_messages/' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"

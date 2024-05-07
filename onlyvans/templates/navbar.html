@@ -25,7 +25,7 @@
                 </li>
                 <li class="nav-item">
                     <a class="{% if request.path|starts_with:'/direct_messages/' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
-                       href="{% url 'direct_messages:message_threads' %}">Messages</a>
+                       href="{% url 'direct_messages:direct_messages' %}">Messages</a>
                 </li>
                 <li class="nav-item">
                     <a class="{% if request.resolver_match.url_name == 'subscriptions' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"

@@ -3,5 +3,12 @@
 {% include 'messages.html' %}
 <div class="container main py-5">
     <h2>👋 Welcome, {% if user.first_name %}{{ user.first_name }}{% else %}@{{ user.username }}{% endif %}!</h2>
+    <hr>
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Posts:</h3>
+            {% include 'creator/feed.html' with posts=posts %}
+        </div>
+    </div>
 </div>
 {% endblock %}

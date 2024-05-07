@@ -3,9 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.conf import settings
 from account.models import CustomUser as User
-from creator.models import Tier, Subscription
+from creator.models import Tier, Subscription, Post
 from django.urls import reverse
-
+from django.db.models import Q, Value, CharField
 from .decorators import client_required
 import stripe
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
@@ -13,7 +13,6 @@ from django.views.decorators.csrf import csrf_exempt
 import logging
 import datetime
 import pytz
-from django.db import IntegrityError
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +20,26 @@ logger = logging.getLogger(__name__)
 @login_required(login_url='login')
 @client_required
 def dashboard(request):
-    return render(request, 'client/dashboard.html')
+    user = request.user
+
+    # Get all active subscriptions
+    active_subscriptions = Subscription.objects.filter(user=user, status='ACTIVE')
+
+    # Get all content creators that the user is subscribed to
+    followed_creators = [sub.tier.user for sub in active_subscriptions]
+
+    # Fetch posts from the user's active subscriptions and free posts from followed content creators
+    posts = Post.objects.filter(
+        Q(user__in=followed_creators, is_free=True) |
+        Q(user__in=followed_creators, tier__in=[sub.tier for sub in active_subscriptions])
+    ).distinct().order_by('-posted_at')
+
+    posts = posts.annotate(
+        visible=Value(True, output_field=CharField())
+    )
+    return render(request, 'client/dashboard.html', {
+        'posts': posts,
+    })
 
 
 @login_required(login_url='login')

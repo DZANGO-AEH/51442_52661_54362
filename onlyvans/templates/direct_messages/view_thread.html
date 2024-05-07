@@ -4,25 +4,30 @@
 
 {% block content %}
 <div class="container main py-5">
-    <h2>📨 Messages with {{ thread.get_other_participant(request.user).username }}</h2>
+    <h2>📨 Messages with {{ other_participant.username }}</h2>
     <hr>
     <div class="row">
         <div class="col-md-6 offset-md-3">
-            <div class="list-group">
-                {% for message in thread.messages.all %}
-                <div class="list-group-item{% if message.sender == request.user %} list-group-item-secondary{% endif %}">
-                    <strong>{{ message.sender.username }}</strong>
-                    <span class="text-muted">{{ message.sent_at }}</span>
-                    <p>{{ message.body }}</p>
+            <div class="card">
+                <div class="card-body">
+                    <div id ="messages-container" class="overflow-auto" style="max-height: 300px;">
+                        {% for message in thread.messages.all %}
+                        <div class="d-flex {% if message.sender == request.user %}justify-content-end{% else %}justify-content-start{% endif %} mb-3">
+                            <div class="{% if message.sender == request.user %}text-white bg-primary{% else %}bg-light{% endif %} rounded p-2 shadow-sm">
+                                <p class="mb-1">{{ message.body }}</p>
+                                <small class="text-muted">{{ message.sent_at|date:"F j, Y, g:i a" }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <hr>
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <button type="submit" class="btn btn-primary">Send</button>
+                    </form>
                 </div>
-                {% endfor %}
             </div>
-            <hr>
-            <form method="POST">
-                {% csrf_token %}
-                {{ form|crispy }}
-                <button type="submit" class="btn btn-primary">Send</button>
-            </form>
         </div>
     </div>
 </div>

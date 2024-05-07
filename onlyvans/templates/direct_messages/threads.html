@@ -2,13 +2,18 @@
 {% block title %}Messages{% endblock %}
 {% block content %}
 <div class="container main py-5">
-<h2>🗨️ Message Threads</h2>
-<ul>
-    {% for thread in threads %}
-    <li><a href="{% url 'direct_messages:view_thread' thread.id %}">{{ thread }}</a></li>
-    {% empty %}
-    <li>No threads found.</li>
-    {% endfor %}
-</ul>
+    <h2>🗨️ Message Threads</h2>
+    <ul class="list-group">
+        {% for thread_info in threads %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <a href="{% url 'direct_messages:view_thread' thread_info.thread.id %}">
+                Chat with {{ thread_info.other_participant.username }}
+            </a>
+            <span class="badge bg-primary rounded-pill">{{ thread_info.thread.messages.count }}</span>
+        </li>
+        {% empty %}
+        <li class="list-group-item">No threads found.</li>
+        {% endfor %}
+    </ul>
 </div>
 {% endblock %}

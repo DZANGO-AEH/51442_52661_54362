@@ -1,22 +1,28 @@
 from django.db import models
 from account.models import CustomUser as User
 from django.utils import timezone
-
-
-class Message(models.Model):
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
-    body = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f'{self.sender} -> {self.recipient}: {self.body[:50]}'
-
+from django.core.exceptions import ValidationError
 
 class Thread(models.Model):
-    participants = models.ManyToManyField(User)
-    last_message = models.ForeignKey(Message, on_delete=models.SET_NULL, null=True, related_name='+')
+    participants = models.ManyToManyField(User, related_name='threads')
 
     def __str__(self):
-        participant_usernames = ', '.join([p.username for p in self.participants.all()])
-        return f'Thread between: {participant_usernames}'
+        return f"Thread between {', '.join(participant.username for participant in self.participants.all())}"
+
+    def get_other_participant(self, user):
+        return self.participants.exclude(id=user.id).first()
+
+    def clean(self):
+        super().clean()
+        if self.participants.count() > 2:
+            raise ValidationError("A Thread can only have two participants.")
+
+class Message(models.Model):
+    thread = models.ForeignKey(Thread, related_name='messages', on_delete=models.CASCADE)
+    sender = models.ForeignKey(User, related_name='sent_messages', on_delete=models.CASCADE)
+    body = models.TextField()
+    sent_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Message from {self.sender.username} in thread {self.thread}"
+

@@ -2,12 +2,17 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from .forms import CustomUserCreationForm, CustomUserChangeForm, UserProfileForm, UserPasswordChangeForm, CustomUserUpdateForm
-from .models import UserProfile, CustomUser
+from .models import UserProfile, CustomUser as User
 from creator.models import Post, Subscription
+from django.urls import reverse
 from .helpers import get_active_subscribers_count, get_total_likes, get_total_favourites, get_total_subscriptions
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
+from django.db.models import Count, Case, When, Value, BooleanField, Q, CharField, F, Sum
+from django.http import HttpResponseRedirect
+from django.core.exceptions import ValidationError
+import logging
 
 def home(request):
     if request.user.is_authenticated:
@@ -56,45 +61,64 @@ def userlogout(request):
     return redirect('')
 
 
+logger = logging.getLogger(__name__)
+
+
 @login_required
 def profile(request, username):
-    try:
-        user_viewed = get_object_or_404(CustomUser, username=username)
-        user_profile = get_object_or_404(UserProfile, user=user_viewed)
-    except (CustomUser.DoesNotExist, UserProfile.DoesNotExist):
-        messages.error(request, "User profile not found.")
-        user_viewed = request.user
-        user_profile = None
-
-    posts = Post.objects.filter(user=user_viewed).order_by('-posted_at')
+    user_viewed = get_object_or_404(User, username=username)
+    user_profile = get_object_or_404(UserProfile, user=user_viewed)
     is_own_profile = user_viewed == request.user
+
+    user_subscription = Subscription.objects.filter(user=request.user, status='ACTIVE', tier__user=user_viewed).first()
+
+    if is_own_profile:
+        posts = Post.objects.filter(user=user_viewed).order_by('-posted_at')
+        posts = posts.annotate(visible=Value(True, output_field=BooleanField()))
+    else:
+        visible_posts = Post.objects.filter(user=user_viewed, is_free=True)
+        subscribed_posts = Post.objects.none()
+
+        if user_subscription:
+            subscribed_posts = Post.objects.filter(user=user_viewed, tier=user_subscription.tier)
+
+        posts = Post.objects.filter(user=user_viewed).annotate(
+            visible=Case(
+                When(Q(is_free=True) | Q(pk__in=subscribed_posts), then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField(),
+            )
+        ).order_by('-posted_at')
+
+    logger.info(f"Count of all posts: {posts.count()}")
+    for post in posts:
+        logger.info(f"Post: {post.title}, Visible: {post.visible}")
+
+    recipient_subscription = Subscription.objects.filter(user=user_viewed, status='ACTIVE').first()
+    can_message = (
+        (user_subscription and user_subscription.tier.message_permission) or
+        (recipient_subscription and recipient_subscription.tier.message_permission) or
+        is_own_profile
+    )
+
     active_subscribers_count = get_active_subscribers_count(user_viewed)
     total_likes = get_total_likes(user_viewed)
     total_favourites = get_total_favourites(user_viewed)
     total_subscriptions = get_total_subscriptions(user_viewed)
 
-    user_subscription = Subscription.objects.filter(user=request.user, status='ACTIVE').first()
-    recipient_subscription = Subscription.objects.filter(user=user_viewed, status='ACTIVE').first()
-
-    can_message = (
-        user_subscription and user_subscription.tier.message_permission
-    ) or (
-        recipient_subscription and recipient_subscription.tier.message_permission
-    ) or is_own_profile
-
     return render(request, 'account/profile.html', {
         'user': request.user,
         'user_viewed': user_viewed,
         'profile': user_profile,
+        'posts': posts,
         'is_own_profile': is_own_profile,
+        'can_message': can_message,
         'active_subscribers_count': active_subscribers_count,
         'total_likes': total_likes,
         'total_favourites': total_favourites,
         'total_subscriptions': total_subscriptions,
-        'posts': posts,
-        'can_message': can_message
+        'show_visibility': True
     })
-
 @login_required
 def update_profile(request):
     if request.method == 'POST':

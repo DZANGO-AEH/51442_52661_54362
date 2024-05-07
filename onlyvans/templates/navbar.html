@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_filters %}
 <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
     <div class="container">
         <a class="navbar-brand" href="/">
@@ -23,8 +24,8 @@
                        href="{% url '' %}">Notifications</a>
                 </li>
                 <li class="nav-item">
-                    <a class="{% if request.resolver_match.url_name == 'messages' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
-                       href="{% url '' %}">Messages</a>
+                    <a class="{% if request.path|starts_with:'/direct_messages/' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                       href="{% url 'direct_messages:message_threads' %}">Messages</a>
                 </li>
                 <li class="nav-item">
                     <a class="{% if request.resolver_match.url_name == 'subscriptions' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
@@ -35,7 +36,7 @@
                        href="{% url 'creator:tiers' %}">Tiers</a>
                 </li>
                 <li class="nav-item">
-                    <a class="{% if request.resolver_match.url_name == 'profile' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                    <a class="{% if request.resolver_match.url_name == 'profile' and request.user.username == user.username %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
                        href="{% url 'profile' username=user.username %}">My profile</a>
                 </li>
                 <li class="nav-item">
@@ -53,15 +54,15 @@
                        href="{% url '' %}">Notifications</a>
                 </li>
                 <li class="nav-item">
-                    <a class="{% if request.resolver_match.url_name == 'messages' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
-                       href="{% url '' %}">Messages</a>
+                    <a class="{% if request.path|starts_with:'/direct_messages/' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                       href="{% url 'direct_messages:direct_messages' %}">Messages</a>
                 </li>
                 <li class="nav-item">
                     <a class="{% if request.resolver_match.url_name == 'subscriptions' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
                        href="{% url '' %}">Subscriptions</a>
                 </li>
                 <li class="nav-item">
-                    <a class="{% if request.resolver_match.url_name == 'profile' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                    <a class="{% if request.resolver_match.url_name == 'profile' and request.user.username == user.username %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
                        href="{% url 'profile' username=user.username %}">My profile</a>
                 </li>
                 <li class="nav-item">

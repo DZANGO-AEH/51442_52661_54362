@@ -58,3 +58,10 @@ document.addEventListener('DOMContentLoaded', function () {
         toggleTierField();
     }
 });
+
+window.onload = function() {
+    let container = document.getElementById('messages-container');
+    if (container) {
+        container.scrollTop = container.scrollHeight;
+    }
+}

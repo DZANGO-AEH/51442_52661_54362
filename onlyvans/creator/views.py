@@ -1,20 +1,24 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .decorators import creator_required
-from django.forms import modelformset_factory
 from .forms import PostForm, MediaForm, TierForm
 from .models import Media, Post, Tier
+from django.db.models import Value, CharField
 from django.contrib import messages
 
 
 def home(request):
     return redirect('creator:dashboard')
 
-@login_required(login_url='login')
-@creator_required
 def dashboard(request):
     posts = Post.objects.filter(user=request.user).order_by('-posted_at')
-    context = {'posts': posts}
+    posts = posts.annotate(
+        visible=Value(True, output_field=CharField())
+    )
+    context = {
+        'posts': posts,
+        'show_visibility': False  # Explicitly indicate this is a creator's view
+    }
     return render(request, 'creator/dashboard.html', context)
 
 

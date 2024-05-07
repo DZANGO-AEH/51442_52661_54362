@@ -3,7 +3,6 @@
 {% block content %}
 {% include 'messages.html' %}
 
-
 <div class="container main py-5">
     <h2>
         👋 Welcome, {% if user.first_name %}{{ user.first_name }}{% else %}@{{ user.username }}{% endif %}!
@@ -14,7 +13,7 @@
     <div class="row">
         <div class="col-md-7">
             <h3>Your posts:</h3>
-            {% include 'creator/feed.html' with posts=posts %}
+            {% include 'creator/feed.html' with posts=posts show_visibility=False %}
         </div>
     </div>
 </div>

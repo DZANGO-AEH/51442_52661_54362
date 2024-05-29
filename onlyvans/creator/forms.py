@@ -49,10 +49,27 @@ class MediaForm(forms.Form):
 class TierForm(forms.ModelForm):
     class Meta:
         model = Tier
-        fields = ['name', 'price', 'description', 'message_permission']
+        fields = ['name', 'points_price', 'description', 'message_permission']
 
-    def clean_price(self):
-        price = self.cleaned_data.get('price')
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        user = self.user
+        if user and Tier.objects.filter(user=user, name=name).exists():
+            raise forms.ValidationError("You already have a tier with this name.")
+        return name
+
+    def clean_points_price(self):
+        price = self.cleaned_data.get('points_price')
         if price is not None and price <= 0:
             raise ValidationError(_("Price must be greater than zero."))
         return price
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if self.user and Tier.objects.filter(user=self.user).count() >= 12:
+            raise forms.ValidationError("You cannot have more than 12 tiers.")
+        return cleaned_data

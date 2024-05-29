@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Purchase Points{% endblock %}
+{% block content %}
+{% include 'messages.html' %}
+<div class="container main py-5">
+    <h2>🪙 Purchase points</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <div id="price-display-purchase" class="mt-3">
+            <strong>Total amount to pay: $<span id="amount-to-pay-purchase">0.00</span></strong>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Purchase</button>
+    </form>
+</div>
+<script>
+    const dollarsPerPoint = {{ dollars_per_point }};
+</script>
+{% endblock %}

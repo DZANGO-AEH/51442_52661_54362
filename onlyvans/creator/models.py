@@ -11,47 +11,18 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 class Tier(models.Model):
     name = models.CharField(max_length=50)
-    price = models.DecimalField(max_digits=6, decimal_places=2)
+    points_price = models.IntegerField()
     description = models.TextField(max_length=500)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tiers')
-    stripe_product_id = models.CharField(max_length=100, blank=True, null=True)
-    stripe_price_id = models.CharField(max_length=100, blank=True, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tiers')
     message_permission = models.BooleanField(default=False)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'name'], name='unique_tier_name_per_user')
+        ]
+
     def __str__(self):
-        return f'{self.name} - ${self.price}'
-
-    def save(self, *args, **kwargs):
-        # Create or update the Stripe product
-        if not self.stripe_product_id:
-            product = stripe.Product.create(name=self.name, description=self.description)
-            self.stripe_product_id = product.id
-        else:
-            product = stripe.Product.modify(self.stripe_product_id, name=self.name, description=self.description)
-
-        # Create or update the Stripe price
-        if not self.stripe_price_id:
-            price = stripe.Price.create(
-                unit_amount=int(self.price * 100),  # amount in cents
-                currency="usd",
-                recurring={"interval": "month"},
-                product=self.stripe_product_id,
-            )
-            self.stripe_price_id = price.id
-        else:
-            # Stripe does not support price modification directly.
-            # We must create a new price and disable the old one.
-            old_price_id = self.stripe_price_id
-            price = stripe.Price.create(
-                unit_amount=int(self.price * 100),
-                currency="usd",
-                recurring={"interval": "month"},
-                product=self.stripe_product_id,
-            )
-            self.stripe_price_id = price.id
-            stripe.Price.modify(old_price_id, active=False)
-
-        super().save(*args, **kwargs)
+        return f'{self.name} - {self.points_price} points'
 
 
 class Subscription(models.Model):

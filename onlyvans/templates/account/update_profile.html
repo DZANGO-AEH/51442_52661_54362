@@ -9,13 +9,19 @@
     <hr>
     <div class="row">
         <div class="col-md-7">
+            <form method="post" action="{% url 'create_stripe_account' %}" id="Stripe">
+                {% csrf_token %}
+            </form>
             <form method="post" enctype="multipart/form-data" action="{% url 'update-profile' %}" autocomplete="off">
                 {% csrf_token %}
                 {{ user_form|crispy }}
+                <p><button type="submit" form="Stripe" class="btn btn-success mt-3">Generate your Stripe Account ID</button></p>
                 {{ profile_form|crispy }}
                 <button type="submit" class="btn btn-primary">Save profile changes</button>
                 <p></p><a href="{% url 'change-password' %}">Change your password here.</a></p>
             </form>
+            {% if not user_form.instance.stripe_account_id %}
+            {% endif %}
         </div>
     </div>
 </div>

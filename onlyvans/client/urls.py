@@ -9,7 +9,7 @@ urlpatterns = [
     path('discover/', views.discover_creators, name='discover_creators'),
     path('subscribe/<str:username>/', views.select_tier, name='select-tier'),
     path('subscribe/<str:username>/<int:tier_id>/', views.subscribe_to_tier, name='subscribe-to-tier'),
-    path('stripe-success/', views.stripe_success, name='stripe-success'),
-    path('stripe-cancel/', views.stripe_cancel, name='stripe-cancel'),
-    path('stripe-webhook/', views.stripe_webhook, name='stripe-webhook'),
+    path('subscriptions/', views.subscriptions, name='subscriptions'),
+    path('subscriptions/extend/<int:subscription_id>/', views.extend_subscription, name='extend_subscription'),
+    path('subscriptions/cancel/<int:subscription_id>/', views.cancel_subscription, name='cancel_subscription'),
 ]

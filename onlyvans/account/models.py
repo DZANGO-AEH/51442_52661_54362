@@ -8,7 +8,7 @@ from .validators import validate_twitter_url, validate_instagram_url
 
 class CustomUser(AbstractUser):
     is_content_creator = models.BooleanField(default=False, verbose_name="Are you a content creator?")
-    paypal_email = models.EmailField(_("PayPal email"), null=True, blank=True)  # Add PayPal email
+    stripe_account_id = models.CharField(max_length=255, blank=True, null=True)
     def __str__(self):
         return self.username
 
@@ -33,3 +33,20 @@ def create_or_update_user_profile(sender, instance, created, **kwargs):
         UserProfile.objects.create(user=instance)
     else:
         instance.profile.save()
+
+class Wallet(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='wallet')
+    balance = models.IntegerField(default=0)
+
+class Transaction(models.Model):
+    TRANSACTION_TYPES = [
+        ('PURCHASE', 'Purchase'),
+        ('SUBSCRIPTION', 'Subscription'),
+        ('DONATION', 'Donation'),
+        ('WITHDRAWAL', 'Withdrawal'),
+    ]
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='transactions')
+    type = models.CharField(max_length=20, choices=TRANSACTION_TYPES)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    description = models.TextField(blank=True, null=True)

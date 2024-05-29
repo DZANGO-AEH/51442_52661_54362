@@ -1,29 +1,71 @@
-{% extends 'base.html' %}{% block title %}Tiers{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Tiers{% endblock %}
 {% load crispy_forms_tags %}
 {% block content %}
-{% include 'messages.html' %}
 <div class="container main py-5">
+    {% include 'messages.html' %}
     <h2>🏅 Your Tiers
         <a class="btn btn-primary" href="{% url 'creator:create-tier' %}">Add a new Tier</a>
     </h2>
     <hr>
-
-{% for tier in tiers %}
-<div class="card mb-3">
-    <div class="card-header">{{ tier.name }}:&nbsp;<strong>${{ tier.price }}</strong></div>
-    <div class="card-body">
-        <p>{{ tier.description }}</p>
-        <p>Message Permission: <strong>{{ tier.message_permission|yesno:"Yes,No" }}</strong></p>
-        <h5>Subscribers ({{ tier.subscriber_count }}):</h5>
+    <p>
+        Here you can manage your tiers. Tiers are a way to offer different levels of access to your content. You can set
+        the price and permissions for each tier. Your subscribers can then choose which tier they want to subscribe to.
+        You can have a maximum of 12 tiers at a time. You can also see who is subscribed to each tier here.
+    </p>
+    {% for tier in tiers %}
+    <div class="card mb-3">
+        {% if tier.id %}
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><h4>{{ tier.name }}:</h4>&nbsp;<strong>{{ tier.points_price }}🪙<small>a month</small></strong></span>
+            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                    data-tier-id="{{ tier.id }}" data-tier-name="{{ tier.name }}"
+                    data-url-template="{% url 'creator:delete-tier' 0 %}">
+                Delete
+            </button>
+        </div>
+        <div class="card-body">
+            <p>{{ tier.description }}</p>
+            <p>Message Permission: <strong>{{ tier.message_permission|yesno:"✔️,❌" }}</strong></p>
+            <h5>Subscribers ({{ tier.subscriber_count }}):</h5>
             {% for subscriber in tier.subscribers %}
-            <a href="{% url 'profile' subscriber.user.username %}"><span class="badge text-bg-primary">@{{ subscriber.user.username }}</span></a>
+            <a href="{% url 'profile' subscriber.user.username %}">
+                <span class="badge text-bg-primary">@{{ subscriber.user.username }}</span>
+            </a>
             {% empty %}
-            <span>No subscribers yet.</span>
+            <span>No active subscribers yet.</span>
             {% endfor %}
+        </div>
+        {% else %}
+        <div class="card-header">
+            <span><h4>Invalid Tier</h4></span>
+        </div>
+        {% endif %}
     </div>
+    {% empty %}
+    <p>You have no tiers defined.</p>
+    {% endfor %}
 </div>
-{% empty %}
-<p>You have no tiers defined.</p>
-{% endfor %}
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete the tier <strong id="tierName"></strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="post" id="deleteForm">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

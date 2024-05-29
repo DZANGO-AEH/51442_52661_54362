@@ -2,9 +2,11 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .decorators import creator_required
 from .forms import PostForm, MediaForm, TierForm
-from .models import Media, Post, Tier
+from .models import Media, Post, Tier, Subscription
 from django.db.models import Value, CharField
 from django.contrib import messages
+from django.shortcuts import get_object_or_404
+
 
 
 def home(request):
@@ -73,15 +75,16 @@ def create_post(request):
 @creator_required
 def tiers(request):
     # Fetch all tiers belonging to the current user
-    user_tiers = Tier.objects.filter(user=request.user).order_by('-price').prefetch_related('subscribers')
+    user_tiers = Tier.objects.filter(user=request.user).order_by('-points_price')
 
     # Prepare data to pass to the template
     tiers_with_subscribers = []
     for tier in user_tiers:
-        subscribers = tier.subscribers.all()
+        subscribers = tier.subscribers.filter(status='ACTIVE')
         tier_info = {
+            'id': tier.id,
             'name': tier.name,
-            'price': tier.price,
+            'points_price': tier.points_price,
             'description': tier.description,
             'message_permission': tier.message_permission,
             'subscribers': subscribers,
@@ -90,21 +93,39 @@ def tiers(request):
         tiers_with_subscribers.append(tier_info)
 
     return render(request, 'creator/tiers.html', {'tiers': tiers_with_subscribers})
-
 @login_required
 @creator_required
 def create_tier(request):
-    if not request.user.paypal_email:
-        messages.error(request, "You need to connect your PayPal account before creating a tier.")
+    if not request.user.stripe_account_id:
+        messages.error(request, "You need to connect your Stripe Account ID before creating a tier.")
         return redirect('update-profile')
     if request.method == 'POST':
-        form = TierForm(request.POST)
+        form = TierForm(request.POST, user=request.user)
         if form.is_valid():
-            new_tier = form.save(commit=False)
-            new_tier.user = request.user
-            new_tier.save()
+            tier = form.save(commit=False)
+            tier.user = request.user
+            tier.save()
+            messages.success(request, 'Tier created successfully.')
             return redirect('creator:tiers')
     else:
-        form = TierForm()
+        form = TierForm(user=request.user)
 
     return render(request, 'creator/create_tier.html', {'form': form})
+
+@login_required
+@creator_required
+def delete_tier(request, tier_id):
+    tier = get_object_or_404(Tier, id=tier_id, user=request.user)
+
+    if request.method == 'POST':
+        active_subscribers = Subscription.objects.filter(tier=tier, status='ACTIVE').exists()
+
+        if active_subscribers:
+            messages.error(request, "You cannot delete this tier because it has active subscribers.")
+            return redirect('creator:tiers')
+
+        tier.delete()
+        messages.success(request, "Tier deleted successfully.")
+        return redirect('creator:tiers')
+
+    return render(request, 'creator/tiers.html', {'tier': tier})

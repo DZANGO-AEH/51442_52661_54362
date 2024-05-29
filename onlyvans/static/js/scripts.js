@@ -8,46 +8,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 5000);
     });
 
-    // Handle the "same email as PayPal" checkbox
-    let sameEmailCheckbox = document.querySelector('#id_same_email');
-    let paypalEmailField = document.querySelector('#id_paypal_email');
-    let emailField = document.querySelector('#id_email');
-
-    if (sameEmailCheckbox && paypalEmailField && emailField) {
-        let paypalEmailFieldContainer = paypalEmailField.parentNode;
-
-        function togglePaypalEmailField() {
-            if (sameEmailCheckbox.checked) {
-                paypalEmailFieldContainer.style.display = 'none';
-                paypalEmailField.disabled = true;
-                paypalEmailField.value = emailField.value;
-            } else {
-                paypalEmailFieldContainer.style.display = '';
-                paypalEmailField.disabled = false;
-            }
-        }
-
-        sameEmailCheckbox.addEventListener('change', togglePaypalEmailField);
-        togglePaypalEmailField();
-
-        let form = document.querySelector('form');
-        form.addEventListener('submit', function () {
-            if (sameEmailCheckbox.checked) {
-                paypalEmailField.value = emailField.value;
-            }
-        });
-    }
-
     // Handle the "Is this a free post?" checkbox and its associated tier field
-    let isFreePostCheckbox = document.getElementById('id_is_free');
-    let tierField = document.getElementById('id_tier');
+    const isFreePostCheckbox = document.getElementById('id_is_free');
+    const tierField = document.getElementById('id_tier');
 
     if (isFreePostCheckbox && tierField) {
-        let tierFieldContainer = tierField.closest('.form-group') || tierField.parentNode;
-        let tierLabel = document.querySelector('label[for="id_tier"]');
+        const tierFieldContainer = tierField.closest('.form-group') || tierField.parentNode;
+        const tierLabel = document.querySelector('label[for="id_tier"]');
 
         function toggleTierField() {
-            let isFree = isFreePostCheckbox.checked;
+            const isFree = isFreePostCheckbox.checked;
             tierFieldContainer.style.display = isFree ? 'none' : 'block';
             tierLabel.style.display = isFree ? 'none' : 'block';
             tierField.required = !isFree;
@@ -57,11 +27,59 @@ document.addEventListener('DOMContentLoaded', function () {
         isFreePostCheckbox.addEventListener('change', toggleTierField);
         toggleTierField();
     }
-});
 
-window.onload = function() {
-    let container = document.getElementById('messages-container');
+    // Logic for purchasing points
+    const purchasePointsSelect = document.getElementById('id_points');
+    const purchaseAmountDisplay = document.getElementById('amount-to-pay-purchase');
+
+    if (purchasePointsSelect && purchaseAmountDisplay) {
+        function updatePurchaseAmount() {
+            const points = parseInt(purchasePointsSelect.value, 10);
+            const amountInCents = Math.floor(points * dollarsPerPoint * 100);
+            const amount = (amountInCents / 100).toFixed(2);
+            purchaseAmountDisplay.textContent = amount;
+        }
+
+        purchasePointsSelect.addEventListener('change', updatePurchaseAmount);
+        updatePurchaseAmount();  // Initialize the amount display on page load
+    }
+
+    // Logic for withdrawals
+    const withdrawPointsInput = document.getElementById('id_points');
+    const withdrawAmountDisplay = document.getElementById('amount-to-pay-withdraw');
+
+    if (withdrawPointsInput && withdrawAmountDisplay) {
+        function updateWithdrawAmount() {
+            const points = parseInt(withdrawPointsInput.value, 10);
+            const amountInCents = Math.floor(points * dollarsPerPoint * 100 * 0.5);  // 50% fee
+            const amount = (amountInCents / 100).toFixed(2);
+            withdrawAmountDisplay.textContent = amount;
+        }
+
+        withdrawPointsInput.addEventListener('input', updateWithdrawAmount);
+        updateWithdrawAmount();  // Initialize the amount display on page load
+    }
+
+    // Scroll the messages container to the bottom on load
+    const container = document.getElementById('messages-container');
     if (container) {
         container.scrollTop = container.scrollHeight;
     }
-}
+
+    // Logic for delete tier modal
+    const deleteModal = document.getElementById('deleteModal');
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const tierId = button.getAttribute('data-tier-id');
+            const tierName = button.getAttribute('data-tier-name');
+            const urlTemplate = button.getAttribute('data-url-template');
+
+            const modalBody = deleteModal.querySelector('.modal-body #tierName');
+            const deleteForm = deleteModal.querySelector('#deleteForm');
+
+            modalBody.textContent = tierName;
+            deleteForm.action = urlTemplate.replace(0, tierId);
+        });
+    }
+});

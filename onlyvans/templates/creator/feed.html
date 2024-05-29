@@ -8,7 +8,7 @@
 
         {% if post.visible %}
             {% if post.media.all|length > 1 %}
-            <div id="carousel{{ post.id }}" class="carousel slide" data-bs-ride="carousel">
+            <div id="carousel{{ post.id }}" class="carousel slide" >
                 <div class="carousel-indicators">
                     {% for media in post.media.all %}
                     <button type="button" data-bs-target="#carousel{{ post.id }}" data-bs-slide-to="{{ forloop.counter0 }}"

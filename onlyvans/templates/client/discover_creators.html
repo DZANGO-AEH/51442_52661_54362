@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Discover Creators{% endblock %}
 {% block content %}
+{% include 'messages.html' %}
 <div class="container main py-5">
     <h2>🔍 Discover Content Creators</h2>
     <hr>
@@ -61,7 +62,41 @@
                         <h5 class="card-title">@{{ creator.username }}</h5>
                         <p class="card-text">{{ creator.profile.description|truncatewords:10 }}</p>
                         <p class="card-text text-muted">Joined on {{ creator.date_joined|date:"M d, Y" }}</p>
-                        <a href "{% url 'profile' creator.username %}" class="btn btn-primary">View Profile</a>
+                        <a href="{% url 'profile' creator.username %}" class="btn btn-primary">View Profile</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <hr>
+
+    <h3>💪 Most Active Creators</h3>
+    <div class="row">
+        {% for creator in most_active_creators %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@{{ creator.username }}</h5>
+                        <p class="card-text">{{ creator.profile.description|truncatewords:10 }}</p>
+                        <a href="{% url 'profile' creator.username %}" class="btn btn-primary">View Profile</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <hr>
+
+    <h3>🎲 Random Creators</h3>
+    <div class="row">
+        {% for creator in random_creators %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@{{ creator.username }}</h5>
+                        <p class="card-text">{{ creator.profile.description|truncatewords:10 }}</p>
+                        <a href="{% url 'profile' creator.username %}" class="btn btn-primary">View Profile</a>
                     </div>
                 </div>
             </div>

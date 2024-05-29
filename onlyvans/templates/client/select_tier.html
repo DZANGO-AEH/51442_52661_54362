@@ -26,7 +26,8 @@
                 </div>
                 <div class="card-body">
                     <p>{{ tier.description }}</p>
-                    <h5>${{ tier.price }}</h5>
+                    <h5>{{ tier.points_price }} 🪙</h5>
+                            <p>Message Permission: <strong>{{ tier.message_permission|yesno:"✔️,❌" }}</strong></p>
                     <a href="{% url 'client:subscribe-to-tier' creator.username tier.id %}" class="btn btn-primary">Subscribe</a>
                 </div>
             </div>

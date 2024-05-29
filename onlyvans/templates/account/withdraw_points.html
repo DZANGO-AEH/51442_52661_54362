@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Withdraw Points{% endblock %}
+{% block content %}
+{% include 'messages.html' %}
+<div class="container main py-5">
+    <h2>💸 Withdraw points</h2>
+    <hr>
+    {% if wallet.balance > 0 %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <div id="price-display-withdraw" class="mt-3">
+            <strong>Total amount to be paid out: $<span id="amount-to-pay-withdraw">0.00</span></strong>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Withdraw</button>
+    </form>
+    {% else %}
+    <div>
+        You have no points to withdraw. <a href="/">Return to the home page</a>.
+    </div>
+    {% endif %}
+</div>
+<script>
+    const dollarsPerPoint = {{ dollars_per_point }};
+</script>
+{% endblock %}

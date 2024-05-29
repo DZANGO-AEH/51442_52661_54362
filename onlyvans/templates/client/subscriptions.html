@@ -26,7 +26,12 @@
             </div>
         </div>
         {% empty %}
-        <p>You have no active subscriptions.</p>
+        <p>
+            <strong>You have no active subscriptions.</strong>
+        </p>
+        <p>
+            <a href="{% url 'client:discover_creators' %}" class="btn btn-outline-primary">Discover creators</a>
+        </p>
         {% endfor %}
     </div>
 </div>

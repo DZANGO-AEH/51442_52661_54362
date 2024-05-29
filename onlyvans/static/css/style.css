@@ -6,6 +6,10 @@
     min-height: 100vh;
 }
 
+.alert {
+    z-index: 1000;
+}
+
 .carousel-item {
     height: 600px;
 }
@@ -39,6 +43,19 @@
 }
 .card-header h5 {
 margin-bottom: 0;
+}
+.creator-card {
+height: 500px;
+}
+
+.creator-card .card-img-top {
+height: 150px;
+}
+
+.creator-card .card-body img {
+    border: 8px solid #ffffff;  /* White border, increase thickness */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-top: -50px;  /* Moves the image up */
 }
 
 .profile-header {
@@ -102,4 +119,33 @@ margin-bottom: 0;
 
 .profile-stats span svg {
     margin-right: 5px;  /* Space between icon and text */
+}
+
+#messages-container {
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#messages-container .d-flex {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.liked {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.unliked {
+    font-weight: normal;
+    color: black;
 }

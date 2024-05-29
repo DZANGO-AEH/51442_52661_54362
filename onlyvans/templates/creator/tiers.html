@@ -29,9 +29,9 @@
             <p>Message Permission: <strong>{{ tier.message_permission|yesno:"✔️,❌" }}</strong></p>
             <h5>Subscribers ({{ tier.subscriber_count }}):</h5>
             {% for subscriber in tier.subscribers %}
-            <a href="{% url 'profile' subscriber.user.username %}">
-                <span class="badge text-bg-primary">@{{ subscriber.user.username }}</span>
-            </a>
+
+                <span class="badge text-bg-primary"><a  class="text-secondary link-underline link-underline-opacity-0" href="{% url 'profile' subscriber.user.username %}">@{{ subscriber.user.username }} </a></span>
+
             {% empty %}
             <span>No active subscribers yet.</span>
             {% endfor %}

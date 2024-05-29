@@ -82,4 +82,56 @@ document.addEventListener('DOMContentLoaded', function () {
             deleteForm.action = urlTemplate.replace(0, tierId);
         });
     }
+
+
+     // Logic for message form
+    const messageForm = document.getElementById('message-form');
+    const messageInput = document.getElementById('id_body');
+
+    if (messageInput) {
+        messageInput.setAttribute('placeholder', 'Type your message here...');
+        messageInput.focus();
+
+        messageForm.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                messageForm.submit();
+            }
+        });
+    }
+
+   // Logic for liking posts
+    const likeButtons = document.querySelectorAll('.like-btn');
+    likeButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const postId = this.getAttribute('data-post-id');
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            fetch(`/like/${postId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const likeCountSpan = this.querySelector('.like-count');
+                    likeCountSpan.textContent = data.likes_count;
+
+                    if (data.liked) {
+                        this.classList.add('liked');
+                        this.classList.remove('unliked');
+                        likeCountSpan.classList.add('liked');
+                        likeCountSpan.classList.remove('unliked');
+                    } else {
+                        this.classList.remove('liked');
+                        this.classList.add('unliked');
+                        likeCountSpan.classList.remove('liked');
+                        likeCountSpan.classList.add('unliked');
+                    }
+                }
+            });
+        });
+    });
 });

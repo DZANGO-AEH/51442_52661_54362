@@ -7,6 +7,9 @@
     <form method="POST" autocomplete="off">
         {% csrf_token %}
         {{ form|crispy }}
+        <p class="form-text">
+            Check this if you are a content creator. <strong>You can't change this later.</strong>
+        </p>
         <input class="btn btn-outline-primary" type="submit" value="Register"/>
     </form>
 </div>

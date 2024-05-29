@@ -13,5 +13,7 @@ urlpatterns = [
     path('purchase/', views.purchase_points, name='purchase'),
     path('purchase-success/', views.purchase_success, name='purchase-success'),
     path('withdraw/', views.withdraw_points, name='withdraw'),
+    path('history/', views.event_history, name='history'),
+    path('like/<int:post_id>/', views.like_post, name='like_post'),
 
 ]

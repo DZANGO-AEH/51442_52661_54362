@@ -20,16 +20,12 @@
                        href="{% url 'creator:dashboard' %}">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="{% if request.resolver_match.url_name == 'notifications' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
-                       href="{% url '' %}">Notifications</a>
+                    <a class="{% if request.resolver_match.url_name == 'history' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                       href="{% url 'history' %}">History</a>
                 </li>
                 <li class="nav-item">
                     <a class="{% if request.path|starts_with:'/direct_messages/' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
                        href="{% url 'direct_messages:direct_messages' %}">Messages</a>
-                </li>
-                <li class="nav-item">
-                    <a class="{% if request.resolver_match.url_name == 'subscriptions' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
-                       href="{% url '' %}">Subscribers</a>
                 </li>
                 <li class="nav-item">
                     <a class="{% if request.resolver_match.url_name == 'tiers' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
@@ -48,6 +44,10 @@
                 <li class="nav-item">
                     <a class="{% if request.resolver_match.url_name == 'dashboard' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
                        href="{% url 'client:dashboard' %}">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="{% if request.resolver_match.url_name == 'history' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"
+                       href="{% url 'history' %}">History</a>
                 </li>
                 <li class="nav-item">
                     <a class="{% if request.resolver_match.url_name == 'discover_creators' %}btn btn-secondary navbar-btn{% else %}nav-link{% endif %}"

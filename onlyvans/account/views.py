@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
+from django.core.paginator import Paginator
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.urls import reverse
 from .forms import CustomUserCreationForm, UserProfileForm, UserPasswordChangeForm, CustomUserUpdateForm, PurchasePointsForm, WithdrawPointsForm
-from .models import UserProfile, CustomUser as User, Wallet, Transaction
-from creator.models import Post, Subscription
+from .models import UserProfile, CustomUser as User, Wallet, Transaction, Event
+from creator.models import Post, Subscription, Like
 from django.conf import settings
 from .helpers import get_active_subscribers_count, get_total_likes, get_total_favourites, get_total_subscriptions
 from django.contrib import messages
@@ -13,6 +14,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Case, When, Value, BooleanField, Q
 import logging
 import stripe
+from django.http import JsonResponse
 import time
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -32,8 +34,15 @@ def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
             messages.success(request, 'Your account has been created successfully! You can now login.')
+
+            Event.objects.create(
+                user=user,
+                event_type='Registration',
+                description='Registered a new account'
+            )
+
             return redirect('login')
     context = {'form': form}
     return render(request, 'account/register.html', context)
@@ -77,8 +86,8 @@ def profile(request, username):
     user_subscription = Subscription.objects.filter(user=request.user, status='ACTIVE', tier__user=user_viewed).first()
 
     if is_own_profile:
-        posts = Post.objects.filter(user=user_viewed).order_by('-posted_at')
-        posts = posts.annotate(visible=Value(True, output_field=BooleanField()))
+        posts_list = Post.objects.filter(user=user_viewed).order_by('-posted_at')
+        posts_list = posts_list.annotate(visible=Value(True, output_field=BooleanField()))
     else:
         visible_posts = Post.objects.filter(user=user_viewed, is_free=True)
         subscribed_posts = Post.objects.none()
@@ -86,7 +95,7 @@ def profile(request, username):
         if user_subscription:
             subscribed_posts = Post.objects.filter(user=user_viewed, tier=user_subscription.tier)
 
-        posts = Post.objects.filter(user=user_viewed).annotate(
+        posts_list = Post.objects.filter(user=user_viewed).annotate(
             visible=Case(
                 When(Q(is_free=True) | Q(pk__in=subscribed_posts), then=Value(True)),
                 default=Value(False),
@@ -94,9 +103,9 @@ def profile(request, username):
             )
         ).order_by('-posted_at')
 
-    logger.info(f"Count of all posts: {posts.count()}")
-    for post in posts:
-        logger.info(f"Post: {post.title}, Visible: {post.visible}")
+    paginator = Paginator(posts_list, 10)  # 10 posts per page
+    page_number = request.GET.get('page')
+    posts = paginator.get_page(page_number)
 
     recipient_subscription = Subscription.objects.filter(user=user_viewed, status='ACTIVE').first()
     can_message = (
@@ -110,6 +119,8 @@ def profile(request, username):
     total_favourites = get_total_favourites(user_viewed)
     total_subscriptions = get_total_subscriptions(user_viewed)
 
+    liked_posts = Like.objects.filter(user=request.user, post__in=posts_list).values_list('post_id', flat=True)
+
     return render(request, 'account/profile.html', {
         'user': request.user,
         'user_viewed': user_viewed,
@@ -121,7 +132,8 @@ def profile(request, username):
         'total_likes': total_likes,
         'total_favourites': total_favourites,
         'total_subscriptions': total_subscriptions,
-        'show_visibility': True
+        'show_visibility': True,
+        'liked_posts': liked_posts,
     })
 
 @login_required
@@ -183,6 +195,13 @@ def update_profile(request):
             user_form.save()
             profile_form.save()
             messages.success(request, 'Your profile was successfully updated!')
+
+            Event.objects.create(
+                user=request.user,
+                event_type='Profile Update',
+                description='Updated profile'
+            )
+
             return redirect('update-profile')
         else:
             messages.error(request, 'Please correct the error below.')
@@ -202,6 +221,13 @@ def change_password(request):
             user = password_form.save()
             update_session_auth_hash(request, user)
             messages.success(request, 'Your password was successfully updated!')
+
+            Event.objects.create(
+                user=request.user,
+                event_type='Profile Update',
+                description='Changed password'
+            )
+
             return redirect('update-profile')
         else:
             messages.error(request, 'Please correct the error below.')
@@ -265,6 +291,11 @@ def purchase_success(request):
             amount=points,
             description='Purchase Points'
         )
+        Event.objects.create(
+            user=user,
+            event_type='Purchase',
+            description=f'Purchased {points} points'
+        )
         messages.success(request, "Points successfully purchased!")
     except stripe.error.StripeError as e:
         messages.error(request, f"Stripe error: {str(e)}")
@@ -310,6 +341,13 @@ def withdraw_points(request):
                         description='Points Withdrawal'
                     )
                     messages.success(request, "Withdrawal successfully processed!")
+
+                    Event.objects.create(
+                        user=user,
+                        event_type='Withdrawal',
+                        description=f'Withdrew {amount} points'
+                    )
+
                     return redirect('')
                 except stripe.error.StripeError as e:
                     messages.error(request, f"Stripe error: {e}")
@@ -319,3 +357,29 @@ def withdraw_points(request):
         form = WithdrawPointsForm(initial={'points': wallet.balance})
 
     return render(request, 'account/withdraw_points.html', {'wallet': wallet, 'form': form, 'dollars_per_point': DOLLARS_PER_POINT})
+
+@login_required
+def event_history(request):
+    user = request.user
+    events_list = Event.objects.filter(user=user).order_by('-timestamp')
+
+    paginator = Paginator(events_list, 20)
+    page_number = request.GET.get('page')
+    events = paginator.get_page(page_number)
+
+    return render(request, 'account/event_history.html', {'events': events})
+
+
+@login_required
+def like_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    like, created = Like.objects.get_or_create(user=request.user, post=post)
+
+    if not created:
+        like.delete()
+        liked = False
+    else:
+        like.save()
+        liked = True
+
+    return JsonResponse({'success': True, 'likes_count': post.likes_count, 'liked': liked})

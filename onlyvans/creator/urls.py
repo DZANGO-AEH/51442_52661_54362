@@ -9,4 +9,5 @@ urlpatterns = [
     path('tiers/', views.tiers, name="tiers"),
     path('tiers/create/', views.create_tier, name="create-tier"),
     path('tiers/delete/<int:tier_id>/', views.delete_tier, name='delete-tier'),
+    path('post/<int:post_id>/delete/', views.post_delete, name='post_delete'),
 ]

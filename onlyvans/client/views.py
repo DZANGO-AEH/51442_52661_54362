@@ -1,18 +1,19 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from account.models import CustomUser as User
-from creator.models import Tier, Subscription, Post
+from account.models import CustomUser as User, Wallet, Event
+from creator.models import Tier, Subscription, Post, Like
 from django.db.models import Q, Value, CharField, Count
 from .decorators import client_required
 import random
+from django.core.paginator import Paginator
 import logging
 from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
 
-@login_required(login_url='login')
+@login_required
 @client_required
 def dashboard(request):
     user = request.user
@@ -24,16 +25,24 @@ def dashboard(request):
     followed_creators = [sub.tier.user for sub in active_subscriptions]
 
     # Fetch posts from the user's active subscriptions and free posts from followed content creators
-    posts = Post.objects.filter(
+    posts_list = Post.objects.filter(
         Q(user__in=followed_creators, is_free=True) |
         Q(user__in=followed_creators, tier__in=[sub.tier for sub in active_subscriptions])
     ).distinct().order_by('-posted_at')
 
-    posts = posts.annotate(
-        visible=Value(True, output_field=CharField())
-    )
+    posts_list = posts_list.annotate(visible=Value(True, output_field=CharField()))
+
+    # Paginate the posts
+    paginator = Paginator(posts_list, 10)  # 10 posts per page
+    page_number = request.GET.get('page')
+    posts = paginator.get_page(page_number)
+
+    # Pobranie listy polubionych postów przez zalogowanego użytkownika
+    liked_posts = Like.objects.filter(user=request.user, post__in=posts_list).values_list('post_id', flat=True)
+
     return render(request, 'client/dashboard.html', {
         'posts': posts,
+        'liked_posts': liked_posts,
     })
 
 @login_required(login_url='login')
@@ -129,6 +138,18 @@ def subscribe_to_tier(request, username, tier_id):
         end_date=now + timezone.timedelta(days=30)
     )
 
+    Event.objects.create(
+        user=user,
+        event_type='SUBSCRIPTION',
+        description=f'Subscribed to {creator.username}\'s {tier.name} tier for 30 days.'
+    )
+
+    Event.objects.create(
+        user=creator,
+        event_type='SUBSCRIPTION',
+        description=f'{user.username} subscribed to your {tier.name} tier for 30 days.'
+    )
+
     messages.success(request, 'You have successfully subscribed to the tier.')
     return redirect('client:dashboard')
 
@@ -168,6 +189,18 @@ def extend_subscription(request, subscription_id):
     subscription.end_date += timezone.timedelta(days=30)
     subscription.save()
 
+    Event.objects.create(
+        user=user,
+        event_type='SUBSCRIPTION_EXTENDED',
+        description=f'Extended subscription to {creator.username}\'s {tier.name} tier.'
+    )
+
+    Event.objects.create(
+        user=creator,
+        event_type='SUBSCRIPTION_EXTENDED',
+        description=f'{user.username} extended their subscription to your {tier.name} tier.'
+    )
+
     messages.success(request, 'You have successfully extended the subscription.')
     return redirect('client:subscriptions')
 
@@ -177,6 +210,18 @@ def cancel_subscription(request, subscription_id):
     subscription = get_object_or_404(Subscription, id=subscription_id, user=request.user, status='ACTIVE')
     subscription.status = 'CANCELLED'
     subscription.save()
+
+    Event.objects.create(
+        user=request.user,
+        event_type='SUBSCRIPTION_CANCELLED',
+        description=f'Cancelled subscription to {subscription.tier.user.username}\'s {subscription.tier.name} tier.'
+    )
+
+    Event.objects.create(
+        user=subscription.tier.user,
+        event_type='SUBSCRIPTION_CANCELLED',
+        description=f'{request.user.username} cancelled their subscription to your {subscription.tier.name} tier.'
+    )
 
     messages.success(request, 'You have successfully cancelled the subscription.')
     return redirect('client:subscriptions')

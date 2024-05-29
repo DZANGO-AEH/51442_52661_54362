@@ -19,13 +19,7 @@
         <div class="row">
             {% for creator in search_results %}
                 <div class="col-md-4 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">@{{ creator.username }}</h5>
-                            <p class="card-text">{{ creator.profile.description|truncatewords:10 }}</p>
-                            <a href="{% url 'profile' creator.username %}" class="btn btn-primary">View Profile</a>
-                        </div>
-                    </div>
+                    {% include 'creator/creator_card.html' %}
                 </div>
             {% endfor %}
             {% if not search_results %}
@@ -39,14 +33,7 @@
     <div class="row">
         {% for creator in top_creators %}
             <div class="col-md-4 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">@{{ creator.username }}</h5>
-                        <p class="card-text">{{ creator.profile.description|truncatewords:10 }}</p>
-                        <p class="card-text text-muted">Subscribers: {{ creator.subscribers_count }}</p>
-                        <a href="{% url 'profile' creator.username %}" class="btn btn-primary">View Profile</a>
-                    </div>
-                </div>
+                {% include 'creator/creator_card.html' %}
             </div>
         {% endfor %}
     </div>
@@ -57,14 +44,7 @@
     <div class="row">
         {% for creator in new_faces %}
             <div class="col-md-4 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">@{{ creator.username }}</h5>
-                        <p class="card-text">{{ creator.profile.description|truncatewords:10 }}</p>
-                        <p class="card-text text-muted">Joined on {{ creator.date_joined|date:"M d, Y" }}</p>
-                        <a href="{% url 'profile' creator.username %}" class="btn btn-primary">View Profile</a>
-                    </div>
-                </div>
+                {% include 'creator/creator_card.html' %}
             </div>
         {% endfor %}
     </div>
@@ -75,13 +55,7 @@
     <div class="row">
         {% for creator in most_active_creators %}
             <div class="col-md-4 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">@{{ creator.username }}</h5>
-                        <p class="card-text">{{ creator.profile.description|truncatewords:10 }}</p>
-                        <a href="{% url 'profile' creator.username %}" class="btn btn-primary">View Profile</a>
-                    </div>
-                </div>
+                {% include 'creator/creator_card.html' %}
             </div>
         {% endfor %}
     </div>
@@ -92,13 +66,7 @@
     <div class="row">
         {% for creator in random_creators %}
             <div class="col-md-4 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">@{{ creator.username }}</h5>
-                        <p class="card-text">{{ creator.profile.description|truncatewords:10 }}</p>
-                        <a href="{% url 'profile' creator.username %}" class="btn btn-primary">View Profile</a>
-                    </div>
-                </div>
+                {% include 'creator/creator_card.html' %}
             </div>
         {% endfor %}
     </div>

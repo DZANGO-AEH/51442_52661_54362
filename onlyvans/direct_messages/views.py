@@ -5,6 +5,7 @@ from .forms import MessageForm
 from .models import Message, Thread
 from creator.models import Subscription
 from django.db.models import Count, Q, Max
+from django.core.paginator import Paginator
 from django.http import Http404
 from django.contrib import messages
 from django.core.exceptions import ValidationError
@@ -26,10 +27,13 @@ def direct_messages(request):
         for thread in threads if has_messaging_permission(user, thread.get_other_participant(user))
     ]
 
-    return render(request, 'direct_messages/threads.html', {
-        'threads': threads_context,
-    })
+    paginator = Paginator(threads_context, 20)
+    page_number = request.GET.get('page')
+    threads_page = paginator.get_page(page_number)
 
+    return render(request, 'direct_messages/threads.html', {
+        'threads': threads_page,
+    })
 
 @login_required
 def view_thread(request, username=None, thread_id=None):
@@ -44,9 +48,7 @@ def view_thread(request, username=None, thread_id=None):
 
         thread = Thread.objects.filter(participants=user).filter(participants=other_user).first()
         if not thread:
-            # Prevent more than two participants in a thread
-            if Thread.objects.filter(participants=user).count() >= 2:
-                raise ValidationError("A Thread can only have two participants.")
+            # Create a new thread
             thread = Thread.objects.create()
             thread.participants.add(user, other_user)
     else:
@@ -74,6 +76,7 @@ def view_thread(request, username=None, thread_id=None):
         'form': form,
         'other_participant': other_user,
     })
+
 
 
 def has_messaging_permission(sender, recipient):

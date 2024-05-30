@@ -1,6 +1,7 @@
 from django.db.models import Count
 from django.utils import timezone
-from creator.models import Tier, Post, Favourite, Subscription
+from creator.models import Tier, Post
+from client.models import Subscription
 from interactions.models import Like
 
 def get_active_subscribers_count(user):

@@ -16,8 +16,8 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ subscription.tier.name }}</h5>
                     <p class="card-text">{{ subscription.tier.description }}</p>
-                    <p class="card-text"><strong>Creator:</strong> @{{ subscription.tier.user.username }}</p>
-                    <p class="card-text"><strong>Price:</strong> {{ subscription.tier.points_price }}🪙 a month</p>
+                    <p class="card-text"><strong>Creator: </strong><a href="{% url 'profile' subscription.tier.user.username %}">@{{ subscription.tier.user.username }}</a> </p>
+                    <p class="card-text"><strong>Price: </strong>{{ subscription.tier.points_price }}🪙 a month</p>
                     <p class="card-text"><strong>Message Permission:</strong> {{ subscription.tier.message_permission|yesno:"✔️,❌" }}</p>
                     <p class="card-text"><strong>Expires on:</strong> {{ subscription.end_date|date:"F j, Y" }}</p>
                     <a href="{% url 'client:extend_subscription' subscription.id %}" class="btn btn-primary">Extend another 30 days</a>

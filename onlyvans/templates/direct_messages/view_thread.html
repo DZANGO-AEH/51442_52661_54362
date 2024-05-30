@@ -6,7 +6,7 @@
 {% block content %}
 <div class="container main py-5">
     {% include 'messages.html' %}
-    <h2>📨 Messages with @{{ other_participant.username }}</h2>
+    <h2>📨 Messages with <a href="{% url 'profile' other_participant.username %}">@{{ other_participant.username }}</a></h2>
     <hr>
     <div class="row">
         <div class="col-md-8 offset-md-2">

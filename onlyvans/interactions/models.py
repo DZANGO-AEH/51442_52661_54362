@@ -37,3 +37,9 @@ class Like(models.Model):
 
     class Meta:
         unique_together = ('user', 'post')
+
+class Comment(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    text = models.TextField()
+    commented_at = models.DateTimeField(auto_now_add=True)

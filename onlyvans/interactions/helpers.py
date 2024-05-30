@@ -1,4 +1,4 @@
-from creator.models import Subscription
+from client.models import Subscription
 
 
 def has_messaging_permission(sender, recipient):

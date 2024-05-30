@@ -2,8 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .decorators import creator_required
 from .forms import PostForm, MediaForm, TierForm
-from account.models import CustomUser as User, Event
-from .models import Media, Post, Tier, Subscription
+from account.models import CustomUser, Event
+from client.models import Subscription
+from .models import Media, Post, Tier
 from interactions.models import Like
 from django.db.models import Value, CharField
 from django.contrib import messages
@@ -22,13 +23,12 @@ def dashboard(request):
     page_number = request.GET.get('page')
     posts = paginator.get_page(page_number)
 
-    # Pobranie listy polubionych postów przez zalogowanego użytkownika
     liked_posts = Like.objects.filter(user=request.user, post__in=posts_list).values_list('post_id', flat=True)
 
     context = {
         'posts': posts,
-        'liked_posts': liked_posts,  # Dodanie liked_posts do kontekstu
-        'show_visibility': False  # Explicitly indicate this is a creator's view
+        'liked_posts': liked_posts,
+        'show_visibility': False
     }
     return render(request, 'creator/dashboard.html', context)
 
@@ -44,7 +44,7 @@ def create_post(request):
         if post_form.is_valid() and media_form.is_valid():
             post = post_form.save(commit=False)
             post.user = request.user
-            if post.is_free:  # Ensure that tier is not set for free posts
+            if post.is_free:
                 post.tier = None
             post.save()
 
@@ -104,10 +104,8 @@ def post_delete(request, post_id):
 @login_required
 @creator_required
 def tiers(request):
-    # Fetch all tiers belonging to the current user
     user_tiers = Tier.objects.filter(user=request.user).order_by('-points_price')
 
-    # Prepare data to pass to the template
     tiers_with_subscribers = []
     for tier in user_tiers:
         subscribers = tier.subscribers.filter(status='ACTIVE')

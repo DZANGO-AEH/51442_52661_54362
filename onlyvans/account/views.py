@@ -1,5 +1,6 @@
 import stripe
-from creator.models import Post, Subscription
+from creator.models import Post
+from client.models import Subscription
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout

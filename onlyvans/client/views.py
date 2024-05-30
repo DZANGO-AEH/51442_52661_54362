@@ -2,9 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from account.models import CustomUser as User, Event
-from finances.models import Wallet
-from creator.models import Tier, Subscription, Post
+from creator.models import Tier, Post
+from .models import Subscription
 from interactions.models import Like
+from finances.models import Wallet
 from django.db.models import Q, Value, CharField, Count
 from .decorators import client_required
 import random
@@ -91,6 +92,7 @@ def discover_creators(request):
         'search_results': search_results,
         'search_query': search_query
     })
+
 @login_required(login_url='login')
 @client_required
 def select_tier(request, username):
@@ -106,7 +108,14 @@ def subscribe_to_tier(request, username, tier_id):
     tier = get_object_or_404(Tier, id=tier_id, user=creator)
     user = request.user
 
-    # Sprawdzenie, czy użytkownik ma już aktywną subskrypcję do tego twórcy
+    # Ensure the user has a wallet
+    if not hasattr(user, 'wallet'):
+        Wallet.objects.create(user=user)
+
+    # Ensure the creator has a wallet
+    if not hasattr(creator, 'wallet'):
+        Wallet.objects.create(user=creator)
+
     active_subscription = Subscription.objects.filter(
         user=user,
         tier__user=creator,
@@ -119,7 +128,7 @@ def subscribe_to_tier(request, username, tier_id):
 
     if user.wallet.balance < tier.points_price:
         messages.error(request, 'You do not have enough points to subscribe to this tier.')
-        return redirect('client:select_tier', username=username)
+        return redirect('client:select-tier', username=username)
 
     # Deduct points from user's wallet
     user.wallet.balance -= tier.points_price

@@ -1,17 +1,19 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.urls import reverse
-from django.conf import settings
-from account.models import Event
-from creator.decorators import creator_required
-from client.decorators import client_required
-from .models import Wallet, Transaction
-from .forms import PurchasePointsForm, WithdrawPointsForm
 import stripe
+from account.models import Event
+from client.decorators import client_required
+from creator.decorators import creator_required
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.urls import reverse
+
+from .forms import PurchasePointsForm, WithdrawPointsForm
+from .models import Wallet, Transaction
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
-DOLLARS_PER_POINT = 1 / 21.5  # 21.5 points = $1
+dollars_per_point = settings.DOLLARS_PER_POINT
+
 
 @login_required(login_url='login')
 @client_required
@@ -30,7 +32,7 @@ def purchase_points(request):
         form = PurchasePointsForm(request.POST)
         if form.is_valid():
             points = int(form.cleaned_data['points'])
-            amount_in_dollars = points * DOLLARS_PER_POINT
+            amount_in_dollars = points * dollars_per_point
             try:
                 session = stripe.checkout.Session.create(
                     payment_method_types=["card"],
@@ -46,7 +48,8 @@ def purchase_points(request):
                         },
                         "quantity": 1,
                     }],
-                    success_url=request.build_absolute_uri(reverse("purchase-success")) + "?session_id={CHECKOUT_SESSION_ID}&points=" + str(points),
+                    success_url=request.build_absolute_uri(
+                        reverse("purchase-success")) + "?session_id={CHECKOUT_SESSION_ID}&points=" + str(points),
                     cancel_url=request.build_absolute_uri(reverse("purchase")),
                 )
                 return redirect(session.url)
@@ -56,7 +59,8 @@ def purchase_points(request):
             messages.error(request, "Invalid amount.")
     else:
         form = PurchasePointsForm()
-    return render(request, 'account/purchase_points.html', {'form': form, 'dollars_per_point': DOLLARS_PER_POINT})
+    return render(request, 'account/purchase_points.html', {'form': form, 'dollars_per_point': dollars_per_point})
+
 
 @login_required(login_url='login')
 @client_required
@@ -97,6 +101,7 @@ def purchase_success(request):
         messages.error(request, f"Payment error: {str(e)}")
     return redirect("home")
 
+
 @login_required(login_url='login')
 @creator_required
 def withdraw_points(request):
@@ -120,7 +125,8 @@ def withdraw_points(request):
     try:
         account = stripe.Account.retrieve(user.stripe_account_id)
         if 'transfers' not in account.capabilities or account.capabilities['transfers'] != 'active':
-            messages.error(request, "Your Stripe account does not have the required capabilities enabled. Try reconnecting your account!")
+            messages.error(request,
+                           "Your Stripe account does not have the required capabilities enabled. Try reconnecting your account!")
             return redirect('update-profile')
     except stripe.error.StripeError as e:
         messages.error(request, f"Stripe error: {e}")
@@ -133,7 +139,7 @@ def withdraw_points(request):
             if wallet.balance < amount:
                 messages.error(request, "Insufficient points for this withdrawal.")
             else:
-                payout_amount = amount * DOLLARS_PER_POINT * 0.5  # 50% fee
+                payout_amount = amount * dollars_per_point * 0.5  # 50% fee
 
                 try:
                     stripe.Transfer.create(
@@ -167,4 +173,5 @@ def withdraw_points(request):
     else:
         form = WithdrawPointsForm(initial={'points': wallet.balance})
 
-    return render(request, 'account/withdraw_points.html', {'wallet': wallet, 'form': form, 'dollars_per_point': DOLLARS_PER_POINT})
+    return render(request, 'account/withdraw_points.html',
+                  {'wallet': wallet, 'form': form, 'dollars_per_point': dollars_per_point})

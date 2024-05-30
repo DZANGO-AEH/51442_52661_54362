@@ -1,6 +1,7 @@
 from django.db import models
 from account.models import CustomUser
 
+
 class Wallet(models.Model):
     """
     Model representing a user's wallet.

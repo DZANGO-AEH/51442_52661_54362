@@ -1,5 +1,6 @@
 from django import forms
 
+
 class PurchasePointsForm(forms.Form):
     """
     Form for purchasing points.

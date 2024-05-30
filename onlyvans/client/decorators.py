@@ -11,5 +11,5 @@ def client_required(view_func):
         else:
             print("User is not a client, redirecting to account home")
             messages.error(request, "You need to be a client to access this page.")
-            return redirect('')
+            return redirect('home')
     return wrapper_func

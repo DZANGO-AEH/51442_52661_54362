@@ -2,10 +2,6 @@ from django.db.models import Count
 from django.utils import timezone
 from creator.models import Tier, Post, Favourite, Subscription
 from interactions.models import Like
-from .models import Event
-from .forms import UserPasswordChangeForm, CustomUserUpdateForm, UserProfileForm
-from django.contrib import messages
-from django.contrib.auth import update_session_auth_hash
 
 def get_active_subscribers_count(user):
     """

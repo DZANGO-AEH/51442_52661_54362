@@ -1,21 +1,31 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.urls import reverse
+from django.conf import settings
 from account.models import Event
+from creator.decorators import creator_required
+from client.decorators import client_required
 from .models import Wallet, Transaction
 from .forms import PurchasePointsForm, WithdrawPointsForm
 import stripe
-from django.shortcuts import redirect
-from django.urls import reverse
-from django.conf import settings
-import logging
-logger = logging.getLogger(__name__)
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 DOLLARS_PER_POINT = 1 / 21.5  # 21.5 points = $1
 
 @login_required(login_url='login')
+@client_required
 def purchase_points(request):
+    """
+    Handles the purchase of points by the user. Displays a form to enter the number of points to purchase,
+    processes the payment using Stripe, and redirects to the Stripe checkout session.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Renders the purchase points form or redirects to the Stripe checkout session.
+    """
     if request.method == 'POST':
         form = PurchasePointsForm(request.POST)
         if form.is_valid():
@@ -49,7 +59,18 @@ def purchase_points(request):
     return render(request, 'account/purchase_points.html', {'form': form, 'dollars_per_point': DOLLARS_PER_POINT})
 
 @login_required(login_url='login')
+@client_required
 def purchase_success(request):
+    """
+    Handles the successful purchase of points. Updates the user's wallet balance, creates a transaction record,
+    and logs the event.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Redirects to the home page with a success message.
+    """
     session_id = request.GET.get("session_id")
     points = int(request.GET.get("points", 0))
     try:
@@ -73,11 +94,22 @@ def purchase_success(request):
         )
         messages.success(request, "Points successfully purchased!")
     except stripe.error.StripeError as e:
-        messages.error(request, f"Stripe error: {str(e)}")
+        messages.error(request, f"Payment error: {str(e)}")
     return redirect("home")
 
 @login_required(login_url='login')
+@creator_required
 def withdraw_points(request):
+    """
+    Handles the withdrawal of points by the user. Displays a form to enter the number of points to withdraw,
+    processes the withdrawal using Stripe, and updates the user's wallet balance.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Renders the withdrawal form or redirects to the home page with a success message.
+    """
     user = request.user
     wallet, created = Wallet.objects.get_or_create(user=user)
 
@@ -91,7 +123,6 @@ def withdraw_points(request):
             messages.error(request, "Your Stripe account does not have the required capabilities enabled. Try reconnecting your account!")
             return redirect('update-profile')
     except stripe.error.StripeError as e:
-        logger.error(f"Stripe error while retrieving account: {e}")
         messages.error(request, f"Stripe error: {e}")
         return redirect('update-profile')
 
@@ -112,7 +143,7 @@ def withdraw_points(request):
                         description='Points Withdrawal'
                     )
 
-                    wallet.balance -= amount  # Zmniejszenie salda przeniesione do bloku try
+                    wallet.balance -= amount
                     wallet.save()
                     Transaction.objects.create(
                         user=user,
@@ -130,7 +161,6 @@ def withdraw_points(request):
 
                     return redirect('home')
                 except stripe.error.StripeError as e:
-                    logger.error(f"Stripe error while processing transfer: {e}")
                     messages.error(request, f"Stripe error: {e}")
         else:
             messages.error(request, "Amount is required.")

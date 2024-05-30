@@ -10,5 +10,5 @@ def creator_required(view_func):
         else:
             print("User is not a creator, redirecting to account home")
             messages.error(request, "You need to be a content creator to access this page.")
-            return redirect('')
+            return redirect('home')
     return wrapper_func

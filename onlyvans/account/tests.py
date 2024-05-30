@@ -143,5 +143,3 @@ class AccountTests(TestCase):
         self.user.refresh_from_db()
         self.assertIsNotNone(self.user.stripe_account_id)
 
-if __name__ == '__main__':
-    unittest.main()

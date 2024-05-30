@@ -17,7 +17,7 @@ from django.utils import timezone
 @client_required
 def dashboard(request):
     """
-    Display the client's dashboard with posts from followed creators and liked posts.
+    Display the client's dashboard with posts from followed creators.
 
     Retrieves active subscriptions of the user, followed creators, and their posts,
     then paginates the posts and returns the dashboard view.

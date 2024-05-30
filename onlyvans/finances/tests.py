@@ -140,7 +140,3 @@ class FinancesTests(TestCase):
         transactions = Transaction.objects.filter(user=self.creator_user, type='WITHDRAWAL')
         self.assertEqual(transactions.count(), 1)
         self.assertEqual(transactions.first().amount, 500)
-
-
-if __name__ == '__main__':
-    unittest.main()

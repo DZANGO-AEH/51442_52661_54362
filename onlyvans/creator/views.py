@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .decorators import creator_required
 from .forms import PostForm, MediaForm, TierForm
@@ -8,15 +8,25 @@ from .models import Media, Post, Tier
 from interactions.models import Like
 from django.db.models import Value, CharField
 from django.contrib import messages
-from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator
-
 
 
 @login_required(login_url='login')
 @creator_required
 def dashboard(request):
-    print("In creator dashboard")
+    """
+    Display the creator's dashboard with their posts.
+
+    Retrieves posts created by the logged-in creator, paginates them, and renders
+    them in the 'creator/dashboard.html' template. Also fetches posts liked by the
+    creator for display.
+
+    Args:
+        request: The HTTP request object.
+
+    Returns:
+        HttpResponse: The rendered dashboard page.
+    """
     posts_list = Post.objects.filter(user=request.user).annotate(visible=Value(True, output_field=CharField())).order_by('-posted_at')
     paginator = Paginator(posts_list, 10)
 
@@ -36,8 +46,19 @@ def dashboard(request):
 @login_required(login_url='login')
 @creator_required
 def create_post(request):
+    """
+    Handle the creation of a new post by the creator.
+
+    If the request method is POST, it validates and saves the post and its associated media files.
+    Otherwise, it displays an empty form for creating a post.
+
+    Args:
+        request: The HTTP request object.
+
+    Returns:
+        HttpResponse: The rendered create post page or redirects to the dashboard on successful creation.
+    """
     if request.method == 'POST':
-        print("POST request received")
         post_form = PostForm(request.POST, user=request.user)
         media_form = MediaForm(request.POST, request.FILES)
 
@@ -47,8 +68,6 @@ def create_post(request):
             if post.is_free:
                 post.tier = None
             post.save()
-
-
 
             files = request.FILES.getlist('files')
             allowed_types = ['image/jpeg', 'image/png', 'video/mp4', 'video/avi']
@@ -72,10 +91,6 @@ def create_post(request):
                 Media.objects.create(post=post, file=file)
 
             return redirect('creator:dashboard')
-        else:
-            print("Form is invalid")
-            print("Post form errors:", post_form.errors)
-            print("Media form errors:", media_form.errors)
 
     else:
         post_form = PostForm(user=request.user)
@@ -86,8 +101,23 @@ def create_post(request):
         'media_form': media_form,
     })
 
-@login_required
+
+@login_required(login_url='login')
+@creator_required
 def post_delete(request, post_id):
+    """
+    Handle the deletion of a post by the creator.
+
+    Deletes the specified post if the logged-in user is the creator of the post.
+    Otherwise, displays an error message.
+
+    Args:
+        request: The HTTP request object.
+        post_id: The ID of the post to be deleted.
+
+    Returns:
+        HttpResponse: Redirects to the dashboard page.
+    """
     post = get_object_or_404(Post, id=post_id)
     if request.user == post.user:
         Event.objects.create(
@@ -99,11 +129,24 @@ def post_delete(request, post_id):
         messages.success(request, 'Post deleted successfully.')
     else:
         messages.error(request, 'You do not have permission to delete this post.')
-    return redirect('')
+    return redirect('creator:dashboard')
 
-@login_required
+
+@login_required(login_url='login')
 @creator_required
 def tiers(request):
+    """
+    Display the creator's tiers with their active subscribers.
+
+    Retrieves tiers created by the logged-in creator and their active subscribers,
+    and renders them in the 'creator/tiers.html' template.
+
+    Args:
+        request: The HTTP request object.
+
+    Returns:
+        HttpResponse: The rendered tiers page.
+    """
     user_tiers = Tier.objects.filter(user=request.user).order_by('-points_price')
 
     tiers_with_subscribers = []
@@ -121,9 +164,23 @@ def tiers(request):
         tiers_with_subscribers.append(tier_info)
 
     return render(request, 'creator/tiers.html', {'tiers': tiers_with_subscribers})
-@login_required
+
+
+@login_required(login_url='login')
 @creator_required
 def create_tier(request):
+    """
+    Handle the creation of a new tier by the creator.
+
+    If the request method is POST, it validates and saves the new tier.
+    Otherwise, it displays an empty form for creating a tier.
+
+    Args:
+        request: The HTTP request object.
+
+    Returns:
+        HttpResponse: The rendered create tier page or redirects to the tiers page on successful creation.
+    """
     if not request.user.stripe_account_id:
         messages.error(request, "You need to connect your Stripe Account ID before creating a tier.")
         return redirect('update-profile')
@@ -141,16 +198,29 @@ def create_tier(request):
                 description=f'Created a new tier: {tier.name}'
             )
 
-
             return redirect('creator:tiers')
     else:
         form = TierForm(user=request.user)
 
     return render(request, 'creator/create_tier.html', {'form': form})
 
-@login_required
+
+@login_required(login_url='login')
 @creator_required
 def delete_tier(request, tier_id):
+    """
+    Handle the deletion of a tier by the creator.
+
+    Deletes the specified tier if it has no active subscribers. Otherwise,
+    displays an error message.
+
+    Args:
+        request: The HTTP request object.
+        tier_id: The ID of the tier to be deleted.
+
+    Returns:
+        HttpResponse: Redirects to the tiers page.
+    """
     tier = get_object_or_404(Tier, id=tier_id, user=request.user)
 
     if request.method == 'POST':

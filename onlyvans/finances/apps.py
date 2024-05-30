@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class DirectMessagesConfig(AppConfig):
+class FinancesConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'direct_messages'
+    name = 'finances'

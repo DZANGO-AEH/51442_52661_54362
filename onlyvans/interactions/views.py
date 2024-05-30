@@ -1,15 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from account.models import CustomUser as User
 from .forms import MessageForm
-from .models import Message, Thread
-from creator.models import Subscription
-from django.db.models import Count, Q, Max
+from account.models import CustomUser as User
+from .models import Thread
+from creator.models import Post
+from interactions.models import Like
+from  .helpers import has_messaging_permission
+from django.db.models import Max
 from django.core.paginator import Paginator
 from django.http import Http404
-from django.contrib import messages
-from django.core.exceptions import ValidationError
 from django.core.exceptions import PermissionDenied
+from django.http import JsonResponse
 
 
 @login_required
@@ -68,35 +69,29 @@ def view_thread(request, username=None, thread_id=None):
         message.sender = user
         message.thread = thread
         message.save()
-        return redirect('direct_messages:view_thread', thread_id=thread.id)
+        return redirect('view_thread', thread_id=thread.id)
 
     return render(request, 'direct_messages/view_thread.html', {
         'thread': thread,
-        'messages': thread.messages.order_by('sent_at'),
+        'direct_messages': thread.messages.order_by('sent_at'),
         'form': form,
         'other_participant': other_user,
     })
 
+@login_required
+def like_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    like, created = Like.objects.get_or_create(user=request.user, post=post)
+
+    if not created:
+        like.delete()
+        liked = False
+    else:
+        like.save()
+        liked = True
+
+    return JsonResponse({'success': True, 'likes_count': post.likes_count, 'liked': liked})
 
 
-def has_messaging_permission(sender, recipient):
-    """
-    Determine if two users have messaging permissions.
-    """
-    # Creator to follower
-    creator_to_follower = Subscription.objects.filter(
-        user=recipient,
-        tier__user=sender,
-        tier__message_permission=True,
-        status='ACTIVE'
-    ).exists()
 
-    # Follower to creator
-    follower_to_creator = Subscription.objects.filter(
-        user=sender,
-        tier__user=recipient,
-        tier__message_permission=True,
-        status='ACTIVE'
-    ).exists()
 
-    return creator_to_follower or follower_to_creator

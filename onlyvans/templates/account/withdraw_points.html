@@ -2,8 +2,8 @@
 {% load crispy_forms_tags %}
 {% block title %}Withdraw Points{% endblock %}
 {% block content %}
-{% include 'messages.html' %}
 <div class="container main py-5">
+    {% include 'messages.html' %}
     <h2>💸 Withdraw points</h2>
     <hr>
     {% if wallet.balance > 0 %}

@@ -3,9 +3,9 @@
 {% block title %}Page Not Found{% endblock %}
 {% block content %}
 {% include 'navbar.html' %}
-{% include 'messages.html' %}
 {% block content %}
 <div class="container main py-5 text-center">
+    {% include 'messages.html' %}
     <h1>404</h1>
     <p>Oops! The page you're looking for was not found.</p>
     <a href="" class="btn btn-primary">Go to Homepage</a>

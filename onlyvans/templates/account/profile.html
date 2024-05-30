@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}Profile - {{ user_viewed.username }}{% endblock %}
 {% block content %}
-{% include 'messages.html' %}
 {% load static %}
 {% load custom_filters %}
 <div class="profile-header"
@@ -19,6 +18,7 @@
 </div>
 
 <div class="container main py-2">
+    {% include 'messages.html' %}
     <div class="profile-info">
         <h1>{{ user_viewed.get_full_name|default:user_viewed.username }}</h1>
         <p>{{ profile.description|default:"No description provided by the user." }}</p>
@@ -45,7 +45,7 @@
             <a href="{% url 'client:select-tier' user_viewed.username %}" class="btn btn-success">Subscribe</a>
             {% endif %}
             {% if can_message %}
-            <a href="{% url 'direct_messages:view_thread_with_user' user_viewed.username %}" class="btn btn-secondary">Send Message</a>
+            <a href="{% url 'view_thread_with_user' user_viewed.username %}" class="btn btn-secondary">Send Message</a>
             {% endif %}
             {% endif %}
         </div>
@@ -57,7 +57,7 @@
             <span>👍 Likes: {{ total_likes }}</span>
             {% else %}
             <span>💸 Active subscriptions: {{ total_subscriptions }}</span>
-            <span>❤️ Favourites: {{ total_favourites }}</span>
+            <span>❤️ Likes given: {{ total_likes_given }}</span>
             {% endif %}
         </div>
     </div>

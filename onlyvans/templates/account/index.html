@@ -2,8 +2,8 @@
 {% load static %}
 {% block title %}Home{% endblock %}
 {% block content %}
-{% include 'messages.html' %}
-<div class="container main">
+<div class="container main py-5">
+    {% include 'messages.html' %}
     <div class="py-5 text-center  rounded-3">
         <img class="mt-4 mb-3" width="100" height="100" src="{% static 'img/onlyvans-dark.svg' %}" alt="OnlyVans">
         <h1 class="text-body-emphasis">Welcome to Only<strong>Vans</strong>!</h1>

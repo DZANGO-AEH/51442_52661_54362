@@ -2,8 +2,8 @@
 {% load crispy_forms_tags %}
 {% block title %}Purchase Points{% endblock %}
 {% block content %}
-{% include 'messages.html' %}
 <div class="container main py-5">
+    {% include 'messages.html' %}
     <h2>🪙 Purchase points</h2>
     <form method="post">
         {% csrf_token %}

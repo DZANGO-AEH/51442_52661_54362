@@ -3,7 +3,6 @@ from . import views
 
 
 app_name = 'client'
-
 urlpatterns = [
     path('dashboard/', views.dashboard, name="dashboard"),
     path('discover/', views.discover_creators, name='discover_creators'),

@@ -5,6 +5,7 @@
 
 {% block content %}
 <div class="container main py-5">
+    {% include 'messages.html' %}
     <h2>📨 Messages with @{{ other_participant.username }}</h2>
     <hr>
     <div class="row">
@@ -12,7 +13,7 @@
             <div class="card">
                 <div class="card-body">
                     <div id="messages-container" class="overflow-auto" style="max-height: 400px;">
-                        {% for message in messages %}
+                        {% for message in direct_messages %}
                         <div class="d-flex mb-3 {% if message.sender == request.user %}justify-content-end{% else %}justify-content-start{% endif %}">
                             {% if message.sender != request.user %}
                             {% if message.sender.profile.profile_pic %}

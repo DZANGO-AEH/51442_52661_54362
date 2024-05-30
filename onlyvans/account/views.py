@@ -1,26 +1,33 @@
-from django.shortcuts import render, redirect
-from django.core.paginator import Paginator
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
-from django.urls import reverse
-from .forms import CustomUserCreationForm, UserProfileForm, UserPasswordChangeForm, CustomUserUpdateForm, PurchasePointsForm, WithdrawPointsForm
-from .models import UserProfile, CustomUser as User, Wallet, Transaction, Event
-from creator.models import Post, Subscription, Like
-from django.conf import settings
-from .helpers import get_active_subscribers_count, get_total_likes, get_total_favourites, get_total_subscriptions
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
-from django.db.models import Case, When, Value, BooleanField, Q
-import logging
 import stripe
-from django.http import JsonResponse
-import time
+from creator.models import Post, Subscription
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
+from django.core.paginator import Paginator
+from django.db.models import Case, When, Value, BooleanField, Q
+from django.shortcuts import get_object_or_404, render, redirect
+from interactions.models import Like
+from django.contrib.auth import update_session_auth_hash
+
+from .forms import CustomUserCreationForm, UserProfileForm, UserPasswordChangeForm, CustomUserUpdateForm
+from .helpers import get_active_subscribers_count, get_total_likes, get_total_likes_given, get_total_subscriptions
+from .models import UserProfile, CustomUser as User, Event
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
-DOLLARS_PER_POINT = 1 / 21.5  # 21.5 points = $1
+
 
 def home(request):
+    """
+    View for the home page. Redirects authenticated users based on their role.
+
+    Args:
+        request (HttpRequest): The request object.
+
+    Returns:
+        HttpResponse: The rendered home page or a redirect.
+    """
     if request.user.is_authenticated:
         if request.user.is_content_creator:
             return redirect('creator:dashboard')
@@ -30,6 +37,15 @@ def home(request):
 
 
 def register(request):
+    """
+    View for user registration. Handles the registration form and user creation.
+
+    Args:
+        request (HttpRequest): The request object.
+
+    Returns:
+        HttpResponse: The rendered registration page or a redirect.
+    """
     form = CustomUserCreationForm()
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
@@ -49,6 +65,15 @@ def register(request):
 
 
 def userlogin(request):
+    """
+    View for user login. Handles the authentication form and user login.
+
+    Args:
+        request (HttpRequest): The request object.
+
+    Returns:
+        HttpResponse: The rendered login page or a redirect.
+    """
     form = AuthenticationForm()
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -69,16 +94,32 @@ def userlogin(request):
 
 
 def userlogout(request):
+    """
+    View for user logout. Logs out the user and redirects to the home page.
+
+    Args:
+        request (HttpRequest): The request object.
+
+    Returns:
+        HttpResponse: A redirect to the home page.
+    """
     logout(request)
     messages.info(request, 'You have been logged out.')
-    return redirect('')
+    return redirect('home')
 
 
-logger = logging.getLogger(__name__)
-
-
-@login_required
+@login_required(login_url='login')
 def profile(request, username):
+    """
+    View for displaying a user's profile. Handles different visibility of posts based on subscription status.
+
+    Args:
+        request (HttpRequest): The request object.
+        username (str): The username of the profile to view.
+
+    Returns:
+        HttpResponse: The rendered profile page.
+    """
     user_viewed = get_object_or_404(User, username=username)
     user_profile = get_object_or_404(UserProfile, user=user_viewed)
     is_own_profile = user_viewed == request.user
@@ -109,14 +150,14 @@ def profile(request, username):
 
     recipient_subscription = Subscription.objects.filter(user=user_viewed, status='ACTIVE').first()
     can_message = (
-        (user_subscription and user_subscription.tier.message_permission) or
-        (recipient_subscription and recipient_subscription.tier.message_permission) or
-        is_own_profile
+            (user_subscription and user_subscription.tier.message_permission) or
+            (recipient_subscription and recipient_subscription.tier.message_permission) or
+            is_own_profile
     )
 
     active_subscribers_count = get_active_subscribers_count(user_viewed)
     total_likes = get_total_likes(user_viewed)
-    total_favourites = get_total_favourites(user_viewed)
+    total_likes_given = get_total_likes_given(user_viewed)
     total_subscriptions = get_total_subscriptions(user_viewed)
 
     liked_posts = Like.objects.filter(user=request.user, post__in=posts_list).values_list('post_id', flat=True)
@@ -130,14 +171,24 @@ def profile(request, username):
         'can_message': can_message,
         'active_subscribers_count': active_subscribers_count,
         'total_likes': total_likes,
-        'total_favourites': total_favourites,
+        'total_likes_given': total_likes_given,
         'total_subscriptions': total_subscriptions,
         'show_visibility': True,
         'liked_posts': liked_posts,
     })
 
-@login_required
+
+@login_required(login_url='login')
 def create_stripe_account(request):
+    """
+    View for creating a Stripe account for the user.
+
+    Args:
+        request (HttpRequest): The request object.
+
+    Returns:
+        HttpResponse: A redirect to Stripe account onboarding or a redirect to the update profile page.
+    """
     user = request.user
     if not user.stripe_account_id:
         try:
@@ -165,6 +216,7 @@ def create_stripe_account(request):
                 return_url=request.build_absolute_uri('/profile/update/'),
                 type='account_onboarding'
             )
+            messages.success(request, 'Stripe account created successfully!')
             return redirect(account_link.url)
         except stripe.error.StripeError as e:
             messages.error(request, f"Stripe error: {e}")
@@ -185,7 +237,7 @@ def create_stripe_account(request):
             messages.error(request, f"Stripe error: {e}")
     return redirect('update-profile')
 
-@login_required
+
 def update_profile(request):
     user = request.user
     if request.method == 'POST':
@@ -213,7 +265,9 @@ def update_profile(request):
         'user_form': user_form,
         'profile_form': profile_form
     })
-@login_required
+
+
+@login_required(login_url='login')
 def change_password(request):
     if request.method == 'POST':
         password_form = UserPasswordChangeForm(request.user, request.POST)
@@ -237,129 +291,17 @@ def change_password(request):
         'password_form': password_form
     })
 
-
-
 @login_required(login_url='login')
-def purchase_points(request):
-    if request.method == 'POST':
-        form = PurchasePointsForm(request.POST)
-        if form.is_valid():
-            points = int(form.cleaned_data['points'])
-            amount_in_dollars = points * DOLLARS_PER_POINT
-            try:
-                session = stripe.checkout.Session.create(
-                    payment_method_types=["card"],
-                    mode="payment",
-                    customer_email=request.user.email,
-                    line_items=[{
-                        "price_data": {
-                            "currency": "usd",
-                            "product_data": {
-                                "name": "Purchase Points",
-                            },
-                            "unit_amount": int(amount_in_dollars * 100),
-                        },
-                        "quantity": 1,
-                    }],
-                    success_url=request.build_absolute_uri(reverse("purchase-success")) + "?session_id={CHECKOUT_SESSION_ID}&points=" + str(points),
-                    cancel_url=request.build_absolute_uri(reverse("purchase")),
-                )
-                return redirect(session.url)
-            except stripe.error.StripeError as e:
-                messages.error(request, f"Stripe error: {str(e)}")
-        else:
-            messages.error(request, "Invalid amount.")
-    else:
-        form = PurchasePointsForm()
-    return render(request, 'account/purchase_points.html', {'form': form, 'dollars_per_point': DOLLARS_PER_POINT})
-
-@login_required(login_url='login')
-def purchase_success(request):
-    session_id = request.GET.get("session_id")
-    points = int(request.GET.get("points", 0))
-    try:
-        session = stripe.checkout.Session.retrieve(session_id)
-        user = request.user
-
-        wallet, created = Wallet.objects.get_or_create(user=user)
-        wallet.balance += points
-        wallet.save()
-
-        Transaction.objects.create(
-            user=user,
-            type='PURCHASE',
-            amount=points,
-            description='Purchase Points'
-        )
-        Event.objects.create(
-            user=user,
-            event_type='Purchase',
-            description=f'Purchased {points} points'
-        )
-        messages.success(request, "Points successfully purchased!")
-    except stripe.error.StripeError as e:
-        messages.error(request, f"Stripe error: {str(e)}")
-    return redirect("")
-
-@login_required(login_url='login')
-def withdraw_points(request):
-    user = request.user
-    wallet, created = Wallet.objects.get_or_create(user=user)
-
-    if not user.stripe_account_id:
-        messages.warning(request, 'Please update your Stripe account ID before making a withdrawal.')
-        return redirect('update-profile')
-
-    account = stripe.Account.retrieve(user.stripe_account_id)
-    if 'transfers' not in account.capabilities or account.capabilities['transfers'] != 'active':
-        messages.error(request, "Your Stripe account does not have the required capabilities enabled. Try reconnecting your account!")
-        return redirect('update-profile')
-
-    if request.method == 'POST':
-        form = WithdrawPointsForm(request.POST)
-        if form.is_valid():
-            amount = form.cleaned_data['points']
-            if wallet.balance < amount:
-                messages.error(request, "Insufficient points for this withdrawal.")
-            else:
-                payout_amount = amount * DOLLARS_PER_POINT * 0.5  # 50% fee
-
-                try:
-                    stripe.Transfer.create(
-                        amount=int(payout_amount * 100),
-                        currency='usd',
-                        destination=user.stripe_account_id,
-                        description='Points Withdrawal'
-                    )
-
-                    wallet.balance -= amount
-                    wallet.save()
-                    Transaction.objects.create(
-                        user=user,
-                        type='WITHDRAWAL',
-                        amount=amount,
-                        description='Points Withdrawal'
-                    )
-                    messages.success(request, "Withdrawal successfully processed!")
-
-                    Event.objects.create(
-                        user=user,
-                        event_type='Withdrawal',
-                        description=f'Withdrew {amount} points'
-                    )
-
-                    return redirect('')
-                except stripe.error.StripeError as e:
-                    messages.error(request, f"Stripe error: {e}")
-        else:
-            messages.error(request, "Amount is required.")
-    else:
-        form = WithdrawPointsForm(initial={'points': wallet.balance})
-
-    return render(request, 'account/withdraw_points.html', {'wallet': wallet, 'form': form, 'dollars_per_point': DOLLARS_PER_POINT})
-
-@login_required
 def event_history(request):
+    """
+    View for displaying the user's event history.
+
+    Args:
+        request (HttpRequest): The request object.
+
+    Returns:
+        HttpResponse: The rendered event history page.
+    """
     user = request.user
     events_list = Event.objects.filter(user=user).order_by('-timestamp')
 
@@ -368,18 +310,3 @@ def event_history(request):
     events = paginator.get_page(page_number)
 
     return render(request, 'account/event_history.html', {'events': events})
-
-
-@login_required
-def like_post(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-    like, created = Like.objects.get_or_create(user=request.user, post=post)
-
-    if not created:
-        like.delete()
-        liked = False
-    else:
-        like.save()
-        liked = True
-
-    return JsonResponse({'success': True, 'likes_count': post.likes_count, 'liked': liked})

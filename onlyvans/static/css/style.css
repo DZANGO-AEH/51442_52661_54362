@@ -1,17 +1,15 @@
-.thin-form {
-    max-width: 500px;
-}
-
 .main {
     min-height: 100vh;
+    max-width: 1000px
 }
 
 .alert {
+    margin-top: 5 px;
     z-index: 1000;
 }
 
 .carousel-item {
-    height: 600px;
+    max-height: 720px;
 }
 
 .carousel-item img, .carousel-item video {
@@ -30,10 +28,11 @@
 }
 
 .card-img-top {
-    height: 600px;  /* Ensures single images have the same height as carousel images */
+    height: 720px;  /* Ensures single images have the same height as carousel images */
     object-fit: cover;
     width: 100%;
 }
+
 .card-header {
     display: flex;
     align-items: center;

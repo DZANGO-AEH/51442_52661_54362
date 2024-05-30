@@ -2,12 +2,13 @@
 {% block title %}Messages{% endblock %}
 {% block content %}
 <div class="container main py-5">
+    {% include 'messages.html' %}
     <h2 class="mb-4">🗨️ Message Threads</h2>
     <ul class="list-group mb-4">
         {% for thread_info in threads %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <div>
-                <a href="{% url 'direct_messages:view_thread' thread_info.thread.id %}" class="text-decoration-none">
+                <a href="{% url 'view_thread' thread_info.thread.id %}" class="text-decoration-none">
                     <strong>Chat with {{ thread_info.other_participant.username }}</strong>
                 </a>
                 <br>

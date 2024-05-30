@@ -7,10 +7,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('', include('account.urls')),
-
     path('client/', include('client.urls')),
     path('creator/', include('creator.urls')),
-    path('direct_messages/', include('direct_messages.urls')),
+    path('', include('interactions.urls')),
+    path('', include('finances.urls')),
 
 ]
 if settings.DEBUG:

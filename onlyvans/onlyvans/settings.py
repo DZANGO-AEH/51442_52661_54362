@@ -51,7 +51,11 @@ INSTALLED_APPS = [
     'account',
     'creator',
     'client',
-    'direct_messages',
+    'interactions',
+    'finances',
+    # 'direct_messages',
+
+    'django_extensions',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"

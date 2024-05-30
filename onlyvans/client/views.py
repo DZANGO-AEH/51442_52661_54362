@@ -1,21 +1,22 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from account.models import CustomUser as User, Wallet, Event
-from creator.models import Tier, Subscription, Post, Like
+from account.models import CustomUser as User, Event
+from finances.models import Wallet
+from creator.models import Tier, Subscription, Post
+from interactions.models import Like
 from django.db.models import Q, Value, CharField, Count
 from .decorators import client_required
 import random
 from django.core.paginator import Paginator
-import logging
 from django.utils import timezone
 
-logger = logging.getLogger(__name__)
 
 
-@login_required
+@login_required(login_url='login')
 @client_required
 def dashboard(request):
+    print("In client dashboard")
     user = request.user
 
     # Get all active subscriptions
@@ -114,7 +115,7 @@ def subscribe_to_tier(request, username, tier_id):
 
     if active_subscription:
         messages.error(request, 'You already have an active subscription to this creator.')
-        return redirect('client:dashboard')
+        return redirect('client:subscriptions')
 
     if user.wallet.balance < tier.points_price:
         messages.error(request, 'You do not have enough points to subscribe to this tier.')

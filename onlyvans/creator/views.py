@@ -3,7 +3,8 @@ from django.contrib.auth.decorators import login_required
 from .decorators import creator_required
 from .forms import PostForm, MediaForm, TierForm
 from account.models import CustomUser as User, Event
-from .models import Media, Post, Tier, Subscription, Like
+from .models import Media, Post, Tier, Subscription
+from interactions.models import Like
 from django.db.models import Value, CharField
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
@@ -11,13 +12,12 @@ from django.core.paginator import Paginator
 
 
 
-def home(request):
-    return redirect('creator:dashboard')
-
-@login_required
+@login_required(login_url='login')
+@creator_required
 def dashboard(request):
+    print("In creator dashboard")
     posts_list = Post.objects.filter(user=request.user).annotate(visible=Value(True, output_field=CharField())).order_by('-posted_at')
-    paginator = Paginator(posts_list, 10)  # 10 posts per page
+    paginator = Paginator(posts_list, 10)
 
     page_number = request.GET.get('page')
     posts = paginator.get_page(page_number)

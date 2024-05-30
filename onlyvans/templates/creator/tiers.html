@@ -17,7 +17,7 @@
     <div class="card mb-3">
         {% if tier.id %}
         <div class="card-header d-flex justify-content-between align-items-center">
-            <span><h4>{{ tier.name }}:</h4>&nbsp;<strong>{{ tier.points_price }}🪙<small>a month</small></strong></span>
+            <span><h4>{{ tier.name }}</h4>&nbsp;<strong>{{ tier.points_price }}🪙<small>a month</small></strong></span>
             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"
                     data-tier-id="{{ tier.id }}" data-tier-name="{{ tier.name }}"
                     data-url-template="{% url 'creator:delete-tier' 0 %}">

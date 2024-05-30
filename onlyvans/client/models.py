@@ -5,6 +5,10 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 class Subscription(models.Model):
+    """
+    Model representing a subscription to a content creator's tier.
+    """
+
     STATUS_CHOICES = [
         ('ACTIVE', 'Active'),
         ('CANCELLED', 'Cancelled'),
@@ -27,17 +31,28 @@ class Subscription(models.Model):
         return f'{self.user.username} - {self.tier.name} subscription'
 
     def is_expired(self):
+        """
+        Checks if the subscription is expired based on the end date.
+
+        Returns:
+            bool: True if the subscription is expired, False otherwise.
+        """
         return self.end_date < timezone.now()
 
     def clean(self):
+        """
+        Custom validation for the Subscription model.
+
+        Raises:
+            ValidationError: If end date is not after the start date, if end date is in the past,
+                             or if there is already an active subscription for the same creator.
+        """
         if self.end_date <= self.start_date:
             raise ValidationError("End date must be after the start date.")
         if self.end_date <= timezone.now():
             raise ValidationError("End date must be in the future.")
 
-        # Validate that a user does not have multiple active subscriptions to the same creator
         if self.status == 'ACTIVE':
-            # Check for other active subscriptions to the same creator
             other_active_subscriptions = Subscription.objects.filter(
                 user=self.user,
                 tier__user=self.tier.user,

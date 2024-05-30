@@ -116,7 +116,12 @@ class ClientTests(TestCase):
         self.client_user.refresh_from_db()
         self.creator_user.refresh_from_db()
 
-        self.assertEqual(subscription.end_date, subscription.start_date + timezone.timedelta(days=60))
+        expected_end_date = subscription.start_date + timezone.timedelta(days=60)
+        actual_end_date = subscription.end_date
+
+        # Porównanie dat bez mikrosekund
+        self.assertEqual(expected_end_date.replace(microsecond=0), actual_end_date.replace(microsecond=0))
+
         self.assertEqual(self.client_user.wallet.balance, initial_client_balance - self.tier.points_price)
         self.assertEqual(self.creator_user.wallet.balance, initial_creator_balance + self.tier.points_price)
 

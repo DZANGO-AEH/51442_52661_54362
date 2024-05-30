@@ -38,7 +38,7 @@ class FinancesTests(TestCase):
 
         response = self.client.get(reverse('purchase'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'account/purchase_points.html')
+        self.assertTemplateUsed(response, 'finances/purchase_points.html')
         self.assertIsInstance(response.context['form'], PurchasePointsForm)
 
     def test_transaction_model(self):
@@ -115,7 +115,7 @@ class FinancesTests(TestCase):
             self.fail(f"Unexpected redirect to {redirect_target} with status code {response.status_code}")
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'account/withdraw_points.html')
+        self.assertTemplateUsed(response, 'finances/withdraw_points.html')
         self.assertIsInstance(response.context['form'], WithdrawPointsForm)
 
     @patch('stripe.Account.retrieve')

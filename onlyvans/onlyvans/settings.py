@@ -53,7 +53,6 @@ INSTALLED_APPS = [
     'client',
     'interactions',
     'finances',
-    # 'direct_messages',
 
     'django_extensions',
 ]

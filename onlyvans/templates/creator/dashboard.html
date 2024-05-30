@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 {% block title %}Dashboard{% endblock %}
+{% load custom_filters %}
 {% block content %}
-
 <div class="container main py-5">
     {% include 'messages.html' %}
     <h2>
-        👋 Welcome, {% if user.first_name %}{{ user.first_name }}{% else %}@{{ user.username }}{% endif %}!
+        👋 {% random_greeting %}, <a href="{% url 'profile' user.username %}">{% if user.first_name %}{{ user.first_name }}{% else %}@{{ user.username }}{% endif %}!</a>
         &nbsp;
         <a class="btn btn-primary" href="{% url 'creator:create-post' %}">Create a new post</a>
     </h2>

@@ -1,4 +1,5 @@
 from django import template
+import random
 
 register = template.Library()
 
@@ -31,3 +32,20 @@ def starts_with(value, prefix):
         bool: True if the value starts with the specified prefix, False otherwise.
     """
     return str(value).startswith(str(prefix))
+
+
+@register.simple_tag
+def random_greeting():
+    """
+    Custom template tag that returns a random greeting message. The greeting is selected from
+    a list of common greetings in different languages.
+
+    Returns:
+        str: A random greeting message.
+    """
+    greetings = [
+        "Hello", "Hola", "Bonjour", "Cześć", "Hallo", "Ciao", "Olá",
+        "Привет", "こんにちは", "你好", "안녕하세요", "Merhaba", "Hej",
+        "Hei", "Namaste", "Salam", "Sawubona", "Halo"
+    ]
+    return random.choice(greetings)

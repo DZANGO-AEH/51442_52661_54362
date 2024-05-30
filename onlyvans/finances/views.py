@@ -59,7 +59,7 @@ def purchase_points(request):
             messages.error(request, "Invalid amount.")
     else:
         form = PurchasePointsForm()
-    return render(request, 'account/purchase_points.html', {'form': form, 'dollars_per_point': dollars_per_point})
+    return render(request, 'finances/purchase_points.html', {'form': form, 'dollars_per_point': dollars_per_point})
 
 
 @login_required(login_url='login')
@@ -173,5 +173,5 @@ def withdraw_points(request):
     else:
         form = WithdrawPointsForm(initial={'points': wallet.balance})
 
-    return render(request, 'account/withdraw_points.html',
+    return render(request, 'finances/withdraw_points.html',
                   {'wallet': wallet, 'form': form, 'dollars_per_point': dollars_per_point})

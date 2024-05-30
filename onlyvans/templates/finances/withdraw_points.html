@@ -17,7 +17,7 @@
     </form>
     {% else %}
     <div>
-        You have no points to withdraw. <a href="/">Return to the home page</a>.
+        You have no points to withdraw. <a href="{% url 'home' %}">Return to the home page</a>.
     </div>
     {% endif %}
 </div>

@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-6r@083(i%+d%@3nwd@4nk8vctntvpn*$eshdo1%f$hd$9-jmlt
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Static URL
 STATIC_URL = "static/"
@@ -53,8 +53,6 @@ INSTALLED_APPS = [
     'client',
     'interactions',
     'finances',
-
-    'django_extensions',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -97,10 +95,10 @@ WSGI_APPLICATION = 'onlyvans.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'new_onlyvans',
-        'USER': 'new_ovuser',
-        'PASSWORD': 'ovpassword',
-        'HOST': 'localhost',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'pgdb',
         'PORT': '5432',
     }
     # 'default': {

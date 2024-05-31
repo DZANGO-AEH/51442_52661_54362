@@ -240,6 +240,26 @@ def create_stripe_account(request):
 
 
 def update_profile(request):
+    """
+    Handles the profile update for a logged-in user.
+
+    If the request method is POST, it will process the forms for updating the
+    user profile. If the forms are valid, the user's profile will be updated and
+    an event will be created to log the update. Success and error messages will
+    be displayed accordingly.
+
+    Args:
+        request (HttpRequest): The HTTP request object containing user data.
+
+    Returns:
+        HttpResponse: Renders the 'account/update_profile.html' template with
+                      the user and profile forms, or redirects to the same page
+                      after successful form submission.
+
+    Forms:
+        CustomUserUpdateForm: Form for updating the CustomUser model.
+        UserProfileForm: Form for updating the UserProfile model.
+    """
     user = request.user
     if request.method == 'POST':
         user_form = CustomUserUpdateForm(request.POST, instance=user)
@@ -270,6 +290,25 @@ def update_profile(request):
 
 @login_required(login_url='login')
 def change_password(request):
+    """
+    Handles the password change for a logged-in user.
+
+    If the request method is POST, it will process the form for changing the
+    user's password. If the form is valid, the user's password will be updated
+    and an event will be created to log the change. Success and error messages
+    will be displayed accordingly.
+
+    Args:
+        request (HttpRequest): The HTTP request object containing user data.
+
+    Returns:
+        HttpResponse: Renders the 'account/change_password.html' template with
+                      the password form, or redirects to the 'update-profile'
+                      page after successful form submission.
+
+    Forms:
+        UserPasswordChangeForm: Form for changing the user's password.
+    """
     if request.method == 'POST':
         password_form = UserPasswordChangeForm(request.user, request.POST)
         if password_form.is_valid():
@@ -291,6 +330,7 @@ def change_password(request):
     return render(request, 'account/change_password.html', {
         'password_form': password_form
     })
+
 
 @login_required(login_url='login')
 def event_history(request):

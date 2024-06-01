@@ -4,29 +4,25 @@ Docker Compose
 
 You can use Docker Compose to easily run the project in a containerized environment.
 
-Just run the following commands.
-
-First you need to make database migrations.
+Just run the following command:
 
 .. code-block:: console
 
-    docker-compose run django python manage.py makemigrations
+    docker-compose up
+
+To turn off the project, run the following command:
 
 .. code-block:: console
 
-    docker-compose run django python manage.py migrate
+    docker-compose down
+
+The project will be available at http://127.0.0.1:8000/
 
 It would be a good idea to create a superuser to access the Django admin.
 
 .. code-block:: console
 
     docker-compose run django python manage.py createsuperuser
-
-Then you can start the project.
-
-.. code-block:: console
-
-    docker-compose up
 
 
 If you don't want to use Docker Compose, you can run the project with the following commands:

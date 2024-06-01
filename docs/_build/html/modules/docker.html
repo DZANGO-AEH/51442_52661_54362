@@ -110,20 +110,17 @@
 <section id="docker-compose">
 <h1>Docker Compose<a class="headerlink" href="#docker-compose" title="Link to this heading">¶</a></h1>
 <p>You can use Docker Compose to easily run the project in a containerized environment.</p>
-<p>Just run the following commands.</p>
-<p>First you need to make database migrations.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="go">docker-compose run django python manage.py makemigrations</span>
+<p>Just run the following command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="go">docker-compose up</span>
 </span></code></pre></div>
 </div>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="go">docker-compose run django python manage.py migrate</span>
+<p>To turn off the project, run the following command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="go">docker-compose down</span>
 </span></code></pre></div>
 </div>
+<p>The project will be available at <a class="reference external" href="http://127.0.0.1:8000/">http://127.0.0.1:8000/</a></p>
 <p>It would be a good idea to create a superuser to access the Django admin.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="go">docker-compose run django python manage.py createsuperuser</span>
-</span></code></pre></div>
-</div>
-<p>Then you can start the project.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="go">docker-compose up</span>
 </span></code></pre></div>
 </div>
 <p>If you don’t want to use Docker Compose, you can run the project with the following commands:</p>

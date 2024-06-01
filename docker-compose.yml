@@ -2,9 +2,12 @@ services:
   django:
     build: .
     container_name: django
-    command: python manage.py runserver 127.0.0.1:8000
+    command: >
+        bash -c "python manage.py makemigrations
+        && python manage.py migrate
+        && python manage.py runserver 0.0.0.0:8000"
     volumes:
-      - .:/usr/src/app
+      - /usr/src/51442_52661_54362/
     ports:
         - "8000:8000"
     depends_on:

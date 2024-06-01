@@ -15,7 +15,7 @@
 \contentsline {section}{\numberline {1.13}Maintainability}{6}{section.1.13}%
 \contentsline {section}{\numberline {1.14}Compatibility}{6}{section.1.14}%
 \contentsline {section}{\numberline {1.15}Monitoring}{7}{section.1.15}%
-\contentsline {chapter}{\numberline {2}Diagrams}{9}{chapter.2}%
+\contentsline {chapter}{\numberline {2}Database choice and diagrams}{9}{chapter.2}%
 \contentsline {section}{\numberline {2.1}Account App Class Diagram}{10}{section.2.1}%
 \contentsline {section}{\numberline {2.2}Client App Class Diagram}{11}{section.2.2}%
 \contentsline {section}{\numberline {2.3}Creator App Class Diagram}{13}{section.2.3}%

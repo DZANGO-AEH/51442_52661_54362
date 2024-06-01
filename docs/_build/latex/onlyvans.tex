@@ -64,7 +64,7 @@
 
 
 \title{OnlyVans}
-\date{May 31, 2024}
+\date{Jun 01, 2024}
 \release{1.0}
 \author{Jacek Miecznikowski, Kamil Danielski, Mateusz Kalenik}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -625,8 +625,48 @@ The system should include monitoring tools to track application performance, err
 \sphinxstepscope
 
 
-\chapter{Diagrams}
-\label{\detokenize{modules/diagrams:diagrams}}\label{\detokenize{modules/diagrams::doc}}
+\chapter{Database choice and diagrams}
+\label{\detokenize{modules/diagrams:database-choice-and-diagrams}}\label{\detokenize{modules/diagrams::doc}}
+\sphinxAtStartPar
+This application is divided into several apps, each one with its own set of models and views. The following diagrams show the class diagram for each app.
+Application uses PostgreSQL as a main database, and SQLite for testing purposes.
+
+\sphinxAtStartPar
+PostgreSQL was selected as the primary database for several reasons:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+\sphinxAtStartPar
+\sphinxstylestrong{Reliability}: PostgreSQL is known for its stability and robustness, making it a reliable choice for managing critical data.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstylestrong{Feature\sphinxhyphen{}Rich}: It offers a rich set of features, including support for advanced data types, full\sphinxhyphen{}text search, and powerful indexing capabilities.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstylestrong{Scalability}: PostgreSQL can efficiently handle large volumes of data and high\sphinxhyphen{}concurrency workloads, ensuring the application can scale as needed.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstylestrong{Standards Compliance}: It adheres to SQL standards, which promotes compatibility and eases the integration with other systems.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstylestrong{Community Support}: PostgreSQL has a strong, active community that contributes to its continuous improvement and provides extensive documentation and support resources.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstylestrong{Open Source}: As an open\sphinxhyphen{}source database, PostgreSQL offers cost\sphinxhyphen{}effectiveness without compromising on quality and features.
+
+\end{enumerate}
+
+\sphinxAtStartPar
+SQLite was chosen for testing purposes due to its simplicity and ease of use. It is a lightweight, serverless database that can be easily set up and used for testing purposes. SQLite is well\sphinxhyphen{}suited for testing because it runs in\sphinxhyphen{}memory and does not require any configuration, making it convenient for running tests quickly and efficiently.
+
+\sphinxAtStartPar
+The following diagrams illustrate the model structure of each app in the project:
+
 
 \section{Account App Class Diagram}
 \label{\detokenize{modules/diagrams:account-app-class-diagram}}
@@ -671,31 +711,27 @@ The system should include monitoring tools to track application performance, err
 You can use Docker Compose to easily run the project in a containerized environment.
 
 \sphinxAtStartPar
-Just run the following commands.
+Just run the following command:
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{g+go}{docker\PYGZhy{}compose up}
+\end{sphinxVerbatim}
 
 \sphinxAtStartPar
-First you need to make database migrations.
+To turn off the project, run the following command:
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{g+go}{docker\PYGZhy{}compose run django python manage.py makemigrations}
+\PYG{g+go}{docker\PYGZhy{}compose down}
 \end{sphinxVerbatim}
 
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{g+go}{docker\PYGZhy{}compose run django python manage.py migrate}
-\end{sphinxVerbatim}
+\sphinxAtStartPar
+The project will be available at \sphinxurl{http://127.0.0.1:8000/}
 
 \sphinxAtStartPar
 It would be a good idea to create a superuser to access the Django admin.
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{g+go}{docker\PYGZhy{}compose run django python manage.py createsuperuser}
-\end{sphinxVerbatim}
-
-\sphinxAtStartPar
-Then you can start the project.
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{g+go}{docker\PYGZhy{}compose up}
 \end{sphinxVerbatim}
 
 \sphinxAtStartPar

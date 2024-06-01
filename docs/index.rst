@@ -15,6 +15,8 @@ This is the documentation for the OnlyVans project. This project is a Django pro
 
    modules/requirements.rst
    modules/diagrams.rst
+   modules/docker.rst
+   modules/testing.rst
    modules/models.rst
    modules/views.rst
    modules/urls.rst

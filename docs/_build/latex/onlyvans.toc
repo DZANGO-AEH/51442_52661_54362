@@ -1,0 +1,68 @@
+\babel@toc {english}{}\relax 
+\contentsline {chapter}{\numberline {1}Requirements}{3}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Functional Requirements}{3}{section.1.1}%
+\contentsline {section}{\numberline {1.2}User Management}{3}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Content Management}{3}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Subscription Management}{4}{section.1.4}%
+\contentsline {section}{\numberline {1.5}Financial Management}{4}{section.1.5}%
+\contentsline {section}{\numberline {1.6}Messaging}{5}{section.1.6}%
+\contentsline {section}{\numberline {1.7}Event Logging}{5}{section.1.7}%
+\contentsline {section}{\numberline {1.8}Non\sphinxhyphen {}Functional Requirements}{5}{section.1.8}%
+\contentsline {section}{\numberline {1.9}Performance}{5}{section.1.9}%
+\contentsline {section}{\numberline {1.10}Security}{5}{section.1.10}%
+\contentsline {section}{\numberline {1.11}Usability}{6}{section.1.11}%
+\contentsline {section}{\numberline {1.12}Reliability}{6}{section.1.12}%
+\contentsline {section}{\numberline {1.13}Maintainability}{6}{section.1.13}%
+\contentsline {section}{\numberline {1.14}Compatibility}{6}{section.1.14}%
+\contentsline {section}{\numberline {1.15}Monitoring}{7}{section.1.15}%
+\contentsline {chapter}{\numberline {2}Diagrams}{9}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Account App Class Diagram}{10}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Client App Class Diagram}{11}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Creator App Class Diagram}{13}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Finances App Class Diagram}{14}{section.2.4}%
+\contentsline {section}{\numberline {2.5}Interactions App Class Diagram}{14}{section.2.5}%
+\contentsline {section}{\numberline {2.6}Project Class Diagram}{15}{section.2.6}%
+\contentsline {section}{\numberline {2.7}Project Class Diagram (App Specific)}{16}{section.2.7}%
+\contentsline {chapter}{\numberline {3}Docker Compose}{17}{chapter.3}%
+\contentsline {chapter}{\numberline {4}Testing Methods and Approaches}{19}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Unit Testing}{19}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Integration Testing}{19}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Manual Testing}{19}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Test Documentation}{20}{section.4.4}%
+\contentsline {section}{\numberline {4.5}Summary}{20}{section.4.5}%
+\contentsline {chapter}{\numberline {5}Models}{21}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Account Models}{21}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Client Models}{22}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Creator Models}{23}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Finances Models}{24}{section.5.4}%
+\contentsline {section}{\numberline {5.5}Interactions Models}{24}{section.5.5}%
+\contentsline {chapter}{\numberline {6}Views}{27}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Account Views}{27}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Client Views}{29}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Creator Views}{31}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Finances Views}{32}{section.6.4}%
+\contentsline {section}{\numberline {6.5}Interactions Views}{33}{section.6.5}%
+\contentsline {chapter}{\numberline {7}URLs}{35}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Account URLs}{35}{section.7.1}%
+\contentsline {section}{\numberline {7.2}Client URLs}{35}{section.7.2}%
+\contentsline {section}{\numberline {7.3}Creator URLs}{36}{section.7.3}%
+\contentsline {section}{\numberline {7.4}Finances URLs}{36}{section.7.4}%
+\contentsline {section}{\numberline {7.5}Interactions URLs}{36}{section.7.5}%
+\contentsline {chapter}{\numberline {8}Forms}{37}{chapter.8}%
+\contentsline {section}{\numberline {8.1}Account Forms}{37}{section.8.1}%
+\contentsline {section}{\numberline {8.2}Creator Forms}{38}{section.8.2}%
+\contentsline {section}{\numberline {8.3}Finances Forms}{40}{section.8.3}%
+\contentsline {section}{\numberline {8.4}Interactions Forms}{40}{section.8.4}%
+\contentsline {chapter}{\numberline {9}Tests}{41}{chapter.9}%
+\contentsline {section}{\numberline {9.1}Account Tests}{41}{section.9.1}%
+\contentsline {section}{\numberline {9.2}Client Tests}{42}{section.9.2}%
+\contentsline {section}{\numberline {9.3}Creator Tests}{42}{section.9.3}%
+\contentsline {section}{\numberline {9.4}Finances Tests}{43}{section.9.4}%
+\contentsline {section}{\numberline {9.5}Interactions Tests}{44}{section.9.5}%
+\contentsline {chapter}{\numberline {10}Utilities}{47}{chapter.10}%
+\contentsline {section}{\numberline {10.1}Account Utilities}{47}{section.10.1}%
+\contentsline {section}{\numberline {10.2}Client Utilities}{49}{section.10.2}%
+\contentsline {section}{\numberline {10.3}Creator Utilities}{49}{section.10.3}%
+\contentsline {section}{\numberline {10.4}Interactions Utilities}{50}{section.10.4}%
+\contentsline {chapter}{\numberline {11}Indices and tables}{51}{chapter.11}%
+\contentsline {chapter}{Python Module Index}{53}{section*.193}%
